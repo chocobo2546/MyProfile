@@ -1,73 +1,76 @@
-# React + TypeScript + Vite
+# 👋 Hi, I'm Make(เมฆ)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to my portfolio repository.  
+This repository showcases a collection of my projects, experiments, and systems that I have developed to strengthen my skills in software development.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 About Me
 
-## React Compiler
+- 🎓 Student at the Faculty of Science and Technology, majoring in Applied Mathematics
+- 💻 Interested in **Web Development and System Design**
+- 🧠 Passionate about building practical, real-world systems and solving problems through code
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🧩 Projects
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+This repository includes a variety of projects across different areas of software development:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 🌐 Web Applications
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Full-stack applications built with modern technologies:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+- **Frontend:** React
+- **Backend:** Java (Spring Boot)
+- **Database:** PostgreSQL / SQLite
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**Example systems:**
+- Restaurant Management System  
+- Queue Reservation System  
+- Data-driven Prediction System  
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+---
+
+### 📊 Data & Algorithms
+
+Projects focused on data analysis and predictive modeling:
+
+- Linear Regression models (e.g. used car price prediction)
+- Emphasis on:
+  - Model accuracy (R²)
+  - Data processing and transformation pipelines
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend:** React, TypeScript, JavaScript, HTML, CSS  
+- **Backend:** Java (Spring Boot), Python (FastAPI, Django), C# (ASP.NET)  
+- **Database:** PostgreSQL, MySQL, SQLite  
+- **Version Control:** Git, GitHub, GitLab  
+
+---
+
+## 📌 Goals
+
+I aim to:
+
+- Build scalable and maintainable software systems  
+- Continuously improve problem-solving and system design skills  
+- Develop real-world applications that deliver meaningful value  
+
+---
+
+## 📫 Contact
+
+- Email: pattrawut.make@gmail.com 
+
+---
+
+## ⭐ Notes
+
+This repository is continuously updated as I learn and build new projects.  
+Thank you for visiting!
