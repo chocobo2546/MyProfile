@@ -4,7 +4,11 @@ interface Props {
   text?: string;
 }
 
-export const Popup = ({ x, y, text = "Hello World" }: Props) => {
+export const Popup = ({
+  x,
+  y,
+  text = "Hello World",
+}: Props) => {
   return (
     <div
       style={{
@@ -12,11 +16,16 @@ export const Popup = ({ x, y, text = "Hello World" }: Props) => {
         left: x,
         bottom: y,
         transform: "translateX(-50%)",
+
         padding: "10px 20px",
         backgroundColor: "black",
         color: "white",
         borderRadius: "8px",
-        whiteSpace: "nowrap",
+
+        whiteSpace: "pre-line",
+
+        maxWidth: 500,
+        lineHeight: 1.5,
       }}
     >
       {text}

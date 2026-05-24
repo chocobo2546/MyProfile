@@ -21,9 +21,10 @@ export const GameCanvas = ({ onBack }: Props) => {
   const lastTimeRef = useRef<number>(0);
   const keysRef = useRef(keys);
 
+  // ✅ spawn position from config
   const playerRef = useRef({
-    x: 0,
-    y: CONFIG.groundY,
+    x: CONFIG.spawnX,
+    y: CONFIG.spawnY,
     velocityY: 0,
     dropTimer: 0,
   });
@@ -33,8 +34,8 @@ export const GameCanvas = ({ onBack }: Props) => {
   }, [keys]);
 
   const [renderState, setRenderState] = useState({
-    x: 0,
-    y: CONFIG.groundY,
+    x: CONFIG.spawnX,
+    y: CONFIG.spawnY,
   });
 
   const [cameraOffset, setCameraOffset] = useState(0);
@@ -84,7 +85,6 @@ export const GameCanvas = ({ onBack }: Props) => {
 
       playerRef.current = newState;
 
-      // ✅ FIX: เรียกครั้งเดียว
       const targetsHit = checkTargetCollision(
         newState.x,
         newState.y,
@@ -118,6 +118,7 @@ export const GameCanvas = ({ onBack }: Props) => {
     };
 
     animationId = requestAnimationFrame(loop);
+
     return () => cancelAnimationFrame(animationId);
   }, []);
 
@@ -134,7 +135,6 @@ export const GameCanvas = ({ onBack }: Props) => {
         overflow: "hidden",
       }}
     >
-
       <Navbar onBack={onBack} />
 
       <World

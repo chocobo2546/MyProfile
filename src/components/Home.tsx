@@ -17,7 +17,7 @@ export const Menu = ({ onStart }: Props) => {
       }}
     >
       <h1 style={{ fontSize: 48, marginBottom: 20 }}>
-        My Game
+        My Profile Game
       </h1>
 
       <button
