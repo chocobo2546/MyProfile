@@ -14,32 +14,57 @@ interface Props {
   onBack: () => void;
 }
 
-export const GameCanvas = ({ onBack }: Props) => {
+export const GameCanvas = ({
+  onBack,
+}: Props) => {
   const keys = useKeyboard();
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const lastTimeRef = useRef<number>(0);
+  const containerRef =
+    useRef<HTMLDivElement>(null);
+
+  const lastTimeRef =
+    useRef<number>(0);
+
   const keysRef = useRef(keys);
 
-  // ✅ spawn position from config
+  const facingRef = useRef<
+    "left" | "right"
+  >("right");
+
   const playerRef = useRef({
     x: CONFIG.spawnX,
     y: CONFIG.spawnY,
     velocityY: 0,
     dropTimer: 0,
+    isGrounded: false,
   });
 
   useEffect(() => {
     keysRef.current = keys;
+
+    if (keys.has("KeyA")) {
+      facingRef.current = "left";
+    }
+
+    if (keys.has("KeyD")) {
+      facingRef.current = "right";
+    }
   }, [keys]);
 
-  const [renderState, setRenderState] = useState({
-    x: CONFIG.spawnX,
-    y: CONFIG.spawnY,
-  });
+  const [renderState, setRenderState] =
+    useState({
+      x: CONFIG.spawnX,
+      y: CONFIG.spawnY,
+    });
 
-  const [cameraOffset, setCameraOffset] = useState(0);
-  const [activeTargets, setActiveTargets] = useState<string[]>([]);
+  const [cameraOffset, setCameraOffset] =
+    useState(0);
+
+  const [activeTargets, setActiveTargets] =
+    useState<string[]>([]);
+
+  const [isGrounded, setIsGrounded] =
+    useState(false);
 
   const worldWidth = CONFIG.worldWidth;
 
@@ -47,7 +72,11 @@ export const GameCanvas = ({ onBack }: Props) => {
     let animationId: number;
 
     const loop = (time: number) => {
-      const delta = calculateDelta(time, lastTimeRef.current);
+      const delta = calculateDelta(
+        time,
+        lastTimeRef.current
+      );
+
       lastTimeRef.current = time;
 
       const isSprinting =
@@ -56,11 +85,15 @@ export const GameCanvas = ({ onBack }: Props) => {
 
       const isDropping =
         keysRef.current.has("KeyS") ||
-        keysRef.current.has("ArrowDown");
+        keysRef.current.has(
+          "ArrowDown"
+        );
 
       const speed =
         CONFIG.speed *
-        (isSprinting ? CONFIG.sprintMultiplier : 1) *
+        (isSprinting
+          ? CONFIG.sprintMultiplier
+          : 1) *
         delta;
 
       const current = playerRef.current;
@@ -76,27 +109,37 @@ export const GameCanvas = ({ onBack }: Props) => {
         CONFIG.gravity,
         CONFIG.jumpForce,
         CONFIG.groundY,
+        CONFIG.deathY,
+        CONFIG.spawnX,
+        CONFIG.spawnY,
         CONFIG.playerWidth,
         CONFIG.playerHeight,
         CONFIG.platforms,
+        CONFIG.partitions,
         isDropping,
         delta
       );
 
       playerRef.current = newState;
 
-      const targetsHit = checkTargetCollision(
-        newState.x,
-        newState.y,
-        CONFIG.playerWidth,
-        CONFIG.playerHeight,
-        CONFIG.targets
+      setIsGrounded(
+        newState.isGrounded
       );
+
+      const targetsHit =
+        checkTargetCollision(
+          newState.x,
+          newState.y,
+          CONFIG.playerWidth,
+          CONFIG.playerHeight,
+          CONFIG.targets
+        );
 
       setActiveTargets(targetsHit);
 
       const containerWidth =
-        containerRef.current?.offsetWidth || 0;
+        containerRef.current
+          ?.offsetWidth || 0;
 
       setCameraOffset((prev) =>
         updateCamera(
@@ -114,16 +157,22 @@ export const GameCanvas = ({ onBack }: Props) => {
         y: newState.y,
       });
 
-      animationId = requestAnimationFrame(loop);
+      animationId =
+        requestAnimationFrame(loop);
     };
 
-    animationId = requestAnimationFrame(loop);
+    animationId =
+      requestAnimationFrame(loop);
 
-    return () => cancelAnimationFrame(animationId);
+    return () =>
+      cancelAnimationFrame(
+        animationId
+      );
   }, []);
 
   const containerWidth =
-    containerRef.current?.offsetWidth || 0;
+    containerRef.current
+      ?.offsetWidth || 0;
 
   return (
     <div
@@ -140,13 +189,28 @@ export const GameCanvas = ({ onBack }: Props) => {
       <World
         cameraOffset={cameraOffset}
         activeTargets={activeTargets}
-        containerWidth={containerWidth}
+        containerWidth={
+          containerWidth
+        }
       />
 
       <Player
         x={renderState.x}
         y={renderState.y}
         cameraOffset={cameraOffset}
+        velocityY={
+          playerRef.current.velocityY
+        }
+        isMoving={
+          keys.has("KeyA") ||
+          keys.has("KeyD")
+        }
+        isRunning={
+          keys.has("ShiftLeft") ||
+          keys.has("ShiftRight")
+        }
+        facing={facingRef.current}
+        isGrounded={isGrounded}
       />
     </div>
   );

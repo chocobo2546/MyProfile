@@ -1,4 +1,8 @@
-import { checkPlatformCollision, isOnPlatform } from "./collision";
+import {
+  checkPlatformCollision,
+  isOnPlatform,
+  checkPartitionCollision,
+} from "./collision";
 
 export const updatePlayer = (
   playerX: number,
@@ -11,9 +15,13 @@ export const updatePlayer = (
   gravity: number,
   jumpForce: number,
   groundY: number,
+  deathY: number,
+  spawnX: number,
+  spawnY: number,
   playerWidth: number,
   playerHeight: number,
   platforms: any[],
+  partitions: any[],
   isDropping: boolean,
   delta: number
 ) => {
@@ -22,22 +30,29 @@ export const updatePlayer = (
   let newVelocityY = velocityY;
   let newDropTimer = dropTimer;
 
+  const prevX = playerX;
   const prevY = playerY;
 
   const isMovingLeft = keys.has("KeyA");
   const isMovingRight = keys.has("KeyD");
   const isJumping = keys.has("Space");
 
-  // movement
+  // =========================================
+  // MOVEMENT
+  // =========================================
+
   if (isMovingLeft) newX -= speed;
   if (isMovingRight) newX += speed;
 
   const minX = 0;
   const maxX = worldWidth - playerWidth;
+
   newX = Math.max(minX, Math.min(maxX, newX));
 
-  // ground / platform
-  const onGround = newY <= groundY;
+  // =========================================
+  // GROUNDED CHECK
+  // =========================================
+
   const onPlatform = isOnPlatform(
     newX,
     newY,
@@ -46,55 +61,112 @@ export const updatePlayer = (
     platforms
   );
 
-  const isGrounded = onGround || onPlatform;
+  let isGrounded = onPlatform;
 
-  // ✅ FIX: drop only once
-  if (isDropping && onPlatform && newDropTimer <= 0) {
+  // =========================================
+  // DROP PLATFORM
+  // =========================================
+
+  if (
+    isDropping &&
+    onPlatform &&
+    newDropTimer <= 0
+  ) {
     newDropTimer = 10;
+    isGrounded = false;
   }
 
-  // ✅ FIX: jump only when velocity = 0
-  if (isJumping && isGrounded && newVelocityY === 0) {
+  // =========================================
+  // JUMP
+  // =========================================
+
+  if (
+    isJumping &&
+    isGrounded &&
+    Math.abs(newVelocityY) < 0.01
+  ) {
     newVelocityY = jumpForce;
+    isGrounded = false;
   }
 
-  // gravity
+  // =========================================
+  // GRAVITY
+  // =========================================
+
   newVelocityY -= gravity;
   newY += newVelocityY;
 
-  // ground collision
-  if (newY < groundY) {
-    newY = groundY;
-    newVelocityY = 0;
+  // =========================================
+  // RESPAWN
+  // =========================================
+
+  if (newY <= deathY) {
+    return {
+      x: spawnX,
+      y: spawnY,
+      velocityY: 0,
+      dropTimer: 0,
+      isGrounded: false,
+    };
   }
 
-  // ลด timer
+  // =========================================
+  // DROP TIMER
+  // =========================================
+
   if (newDropTimer > 0) {
     newDropTimer -= delta;
   }
 
-  // platform collision
-  if (newVelocityY <= 0 && newDropTimer <= 0) {
-    const platformHit = checkPlatformCollision(
-      newX,
-      newY,
-      prevY,
-      newVelocityY,
-      playerWidth,
-      playerHeight,
-      platforms
-    );
+  // =========================================
+  // PLATFORM COLLISION
+  // =========================================
+
+  if (
+    newVelocityY <= 0 &&
+    newDropTimer <= 0
+  ) {
+    const platformHit =
+      checkPlatformCollision(
+        newX,
+        newY,
+        prevY,
+        newVelocityY,
+        playerWidth,
+        playerHeight,
+        platforms
+      );
 
     if (platformHit.collided) {
       newY = platformHit.y;
       newVelocityY = 0;
+      isGrounded = true;
     }
   }
+
+  // =========================================
+  // PARTITION COLLISION
+  // =========================================
+
+  const partitionHit =
+    checkPartitionCollision(
+      newX,
+      newY,
+      prevX,
+      prevY,
+      playerWidth,
+      playerHeight,
+      partitions
+    );
+
+  newX = partitionHit.x;
+  newY = partitionHit.y;
 
   return {
     x: newX,
     y: newY,
     velocityY: newVelocityY,
     dropTimer: newDropTimer,
+    isGrounded,
   };
 };

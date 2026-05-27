@@ -40,7 +40,6 @@ export const checkPlatformCollision = (
     height: number;
   }[]
 ) => {
-  // ❌ ห้ามชนตอนกำลังขึ้น
   if (velocityY > 0) {
     return {
       collided: false,
@@ -65,8 +64,8 @@ export const checkPlatformCollision = (
       playerLeft < platform.x + platform.width;
 
     const crossed =
-      prevBottom >= platformTop &&
-      currBottom <= platformTop;
+      prevBottom >= platformTop - 10 &&
+      currBottom <= platformTop + 10;
 
     if (withinX && crossed) {
       if (platformTop > closestPlatformY) {
@@ -163,4 +162,74 @@ export const checkTargetCollision = (
   }
 
   return collidedTargets;
+};
+
+
+export const checkPartitionCollision = (
+  playerX: number,
+  playerY: number,
+  prevX: number,
+  prevY: number,
+  playerWidth: number,
+  playerHeight: number,
+  partitions: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }[]
+) => {
+  let newX = playerX;
+  let newY = playerY;
+
+  for (const p of partitions) {
+    const playerLeft = newX;
+    const playerRight = newX + playerWidth;
+    const playerBottom = newY;
+    const playerTop = newY + playerHeight;
+
+    const wallLeft = p.x;
+    const wallRight = p.x + p.width;
+    const wallBottom = p.y;
+    const wallTop = p.y + p.height;
+
+    const hit =
+      playerRight > wallLeft &&
+      playerLeft < wallRight &&
+      playerTop > wallBottom &&
+      playerBottom < wallTop;
+
+    if (!hit) continue;
+
+    // previous
+    const prevLeft = prevX;
+    const prevRight = prevX + playerWidth;
+    const prevBottom = prevY;
+    const prevTop = prevY + playerHeight;
+
+    // LEFT
+    if (prevRight <= wallLeft) {
+      newX = wallLeft - playerWidth;
+    }
+
+    // RIGHT
+    else if (prevLeft >= wallRight) {
+      newX = wallRight;
+    }
+
+    // TOP
+    else if (prevBottom >= wallTop) {
+      newY = wallTop;
+    }
+
+    // BOTTOM
+    else if (prevTop <= wallBottom) {
+      newY = wallBottom - playerHeight;
+    }
+  }
+
+  return {
+    x: newX,
+    y: newY,
+  };
 };
