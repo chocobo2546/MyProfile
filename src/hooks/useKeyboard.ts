@@ -5,6 +5,8 @@ export const useKeyboard = () => {
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
+      if (e.repeat) return;
+
       setKeys((prev) => {
         const next = new Set(prev);
         next.add(e.code);

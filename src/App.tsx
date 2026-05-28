@@ -1,24 +1,32 @@
 import { useState } from "react";
-import { GameCanvas } from "./components/GameCanvas";
-import { Menu } from "./components/Home";
 
-type Scene = "menu" | "game";
+import { MenuPage } from "./pages/MenuPage";
+import { GamePage } from "./pages/GamePage";
+import { DownloadsPage } from "./pages/DownloadsPage";
+
+export type Scene = "menu" | "game" | "downloads";
 
 export default function App() {
   const [scene, setScene] = useState<Scene>("menu");
 
-  const startGame = () => {
-    setScene("game");
-  };
-
   return (
     <>
       {scene === "menu" && (
-        <Menu onStart={startGame} />
+        <MenuPage
+          onStart={() => setScene("game")}
+          onDownloads={() => setScene("downloads")}
+        />
       )}
 
       {scene === "game" && (
-        <GameCanvas onBack={() => setScene("menu")} />
+        <GamePage
+          onBack={() => setScene("menu")}
+          onDownloads={() => setScene("downloads")}
+        />
+      )}
+
+      {scene === "downloads" && (
+        <DownloadsPage onBack={() => setScene("menu")} />
       )}
     </>
   );
