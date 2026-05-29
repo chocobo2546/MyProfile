@@ -6,7 +6,7 @@ import nearMountain from "../../assets/background/nearMoutain.png";
 import landGrass from "../../assets/background/landGrass.png";
 
 import treeBig from "../../assets/decorations/bigTree.png";
-import treeOak from "../../assets/decorations/oakTree.png";
+// import treeOak from "../../assets/decorations/oakTree.png";
 
 export const lavaWorld: WorldData = {
   id: "lava-world",

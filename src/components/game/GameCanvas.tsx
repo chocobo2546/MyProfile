@@ -152,7 +152,7 @@ export const GameCanvas = ({
         partitions: currentWorld.partitions,
         // isDropping,
         // dropDuration: GAME_CONFIG.dropDuration,
-        delta,
+         _delta: delta,
       });
 
       playerRef.current = newState;
