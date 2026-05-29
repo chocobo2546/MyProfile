@@ -31,22 +31,65 @@ export type Portal = {
   label?: string;
 };
 
+export type Decoration = {
+  id: string;
+
+  x: number;
+  y: number;
+
+  width: number;
+  height: number;
+
+  image: string;
+
+  zIndex?: number;
+
+  opacity?: number;
+
+  parallax?: number;
+};
+
+export type BackgroundLayer = {
+  image: string;
+
+  speed?: number;
+
+  y?: number;
+  x?: number;
+
+  height?: number;
+
+  opacity?: number;
+
+  repeatX?: boolean;
+
+  size?: string;
+
+  zIndex?: number;
+};
+
 export type WorldData = {
   id: "lava-world" | "ice-world" | string;
 
   worldWidth: number;
 
-  background: string;
+  skyBackground: string;
+
   farBackground?: string;
+
   nearBackground?: string;
+
+  landBackground?: string;
 
   spawnX: number;
   spawnY: number;
 
+  backgroundLayers?: BackgroundLayer[];
   platforms: Platform[];
   partitions: Partition[];
   targets: Target[];
   portals: Portal[];
+  decorations: Decoration[];
 };
 
 export type PlayerState = {

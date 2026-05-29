@@ -1,4 +1,5 @@
 import { GAME_CONFIG } from "../../game/config/gameConfig";
+
 import {
   PLAYER_ANIMATIONS,
   resolveAnimationState,
@@ -7,6 +8,7 @@ import {
 interface Props {
   x: number;
   y: number;
+
   cameraOffset: number;
 
   velocityY: number;
@@ -22,55 +24,87 @@ export const Player = ({
   x,
   y,
   cameraOffset,
+
   velocityY,
+
   isGrounded,
   isMoving,
   isRunning,
+
   facing,
 }: Props) => {
-  const state = resolveAnimationState({
-    isGrounded,
-    velocityY,
-    isMoving,
-    isRunning,
-  });
+  const state =
+    resolveAnimationState({
+      isGrounded,
+      velocityY,
+      isMoving,
+      isRunning,
+    });
 
-  const animation = PLAYER_ANIMATIONS[state];
+  const animation =
+    PLAYER_ANIMATIONS[state];
 
   const currentFrameIndex =
     Math.floor(
-      performance.now() / (1000 / animation.fps)
-    ) % animation.frames.length;
+      performance.now() /
+        (1000 / animation.fps)
+    ) %
+    animation.frames.length;
 
-  const frame = animation.frames[currentFrameIndex];
+  const frame =
+    animation.frames[currentFrameIndex];
 
   return (
     <div
       style={{
         position: "absolute",
+
         left: x + cameraOffset,
         bottom: y,
 
         width: GAME_CONFIG.playerWidth,
         height: GAME_CONFIG.playerHeight,
 
-        zIndex: 50,
+        zIndex: 999,
       }}
     >
+      {/* ===================================== */}
+      {/* HITBOX DEBUG */}
+      {/* ===================================== */}
+
+      {/* <div
+        style={{
+          position: "absolute",
+          inset: 0,
+
+          background:"red",
+
+          boxSizing: "border-box",
+          pointerEvents: "none",
+        }}
+      /> */}
+
+      {/* ===================================== */}
+      {/* PLAYER SPRITE */}
+      {/* ===================================== */}
+
       <img
         src={frame.image}
         alt=""
-        aria-hidden="true"
         draggable={false}
+        aria-hidden="true"
         style={{
           position: "absolute",
+
           left: `calc(50% + ${frame.offsetX}px)`,
+
           bottom: frame.offsetY,
 
           width: frame.width,
           height: frame.height,
 
           imageRendering: "pixelated",
+
           pointerEvents: "none",
           userSelect: "none",
 
@@ -79,7 +113,9 @@ export const Player = ({
               ? "translateX(-50%) scaleX(-1)"
               : "translateX(-50%)",
 
-          transformOrigin: "center center",
+          transformOrigin:
+            "center center",
+          zIndex: 0,
         }}
       />
     </div>

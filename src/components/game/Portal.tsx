@@ -31,6 +31,7 @@ export const Portal = ({ x, y, label }: Props) => {
         userSelect: "none",
 
         animation: "portalFloat 2.2s ease-in-out infinite",
+        zIndex: 200,
       }}
     >
       <div>

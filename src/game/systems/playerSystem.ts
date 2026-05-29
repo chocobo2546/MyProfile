@@ -1,8 +1,10 @@
 import { CONTROLS } from "../config/controls";
+
 import {
   checkPlatformCollision,
   checkPartitionCollision,
   isOnPlatform,
+  isOnPartition,
 } from "./collisionSystem";
 
 import type {
@@ -14,6 +16,7 @@ import type {
 type Params = {
   player: PlayerState;
   keys: Set<string>;
+
   speed: number;
   worldWidth: number;
 
@@ -30,9 +33,7 @@ type Params = {
   platforms: Platform[];
   partitions: Partition[];
 
-  // isDropping: boolean;
-  // dropDuration: number;
-  delta: number;
+  _delta: number;
 };
 
 export const updatePlayer = ({
@@ -40,44 +41,63 @@ export const updatePlayer = ({
   keys,
   speed,
   worldWidth,
+
   gravity,
   jumpForce,
   deathY,
+
   spawnX,
   spawnY,
+
   playerWidth,
   playerHeight,
+
   platforms,
   partitions,
-  // isDropping,
-  // dropDuration,
-  delta,
 }: Params): PlayerState => {
   let newX = player.x;
   let newY = player.y;
+
   let velocityY = player.velocityY;
-  // let dropTimer = Math.max(0, player.dropTimer);
-  let isGrounded = false;
 
   const prevX = player.x;
   const prevY = player.y;
 
-  const moveLeft = keys.has(CONTROLS.moveLeft);
-  const moveRight = keys.has(CONTROLS.moveRight);
-  const jump = keys.has(CONTROLS.jump);
+  let isGrounded = false;
+
+  const moveLeft =
+    keys.has(CONTROLS.moveLeft);
+
+  const moveRight =
+    keys.has(CONTROLS.moveRight);
+
+  const jump =
+    keys.has(CONTROLS.jump);
 
   // =====================================
   // MOVE
   // =====================================
 
-  if (moveLeft) newX -= speed;
-  if (moveRight) newX += speed;
+  if (moveLeft) {
+    newX -= speed;
+  }
 
-  const maxX = Math.max(0, worldWidth - playerWidth);
-  newX = Math.max(0, Math.min(maxX, newX));
+  if (moveRight) {
+    newX += speed;
+  }
+
+  const maxX = Math.max(
+    0,
+    worldWidth - playerWidth
+  );
+
+  newX = Math.max(
+    0,
+    Math.min(maxX, newX)
+  );
 
   // =====================================
-  // PLATFORM CHECK
+  // GROUNDED CHECK
   // =====================================
 
   const onPlatform = isOnPlatform(
@@ -88,22 +108,25 @@ export const updatePlayer = ({
     platforms
   );
 
-  isGrounded = onPlatform;
+  const onPartition = isOnPartition(
+    newX,
+    newY,
+    playerWidth,
+    playerHeight,
+    partitions
+  );
 
-  // =====================================
-  // DROP
-  // =====================================
-
-  // if (isDropping && onPlatform && dropTimer <= 0) {
-  //   dropTimer = dropDuration;
-  //   isGrounded = false;
-  // }
+  isGrounded =
+    onPlatform || onPartition;
 
   // =====================================
   // JUMP
   // =====================================
 
-  if (jump && isGrounded && Math.abs(velocityY) < 0.01) {
+  if (
+    jump &&
+    isGrounded
+  ) {
     velocityY = jumpForce;
     isGrounded = false;
   }
@@ -113,83 +136,72 @@ export const updatePlayer = ({
   // =====================================
 
   velocityY -= gravity;
+
   newY += velocityY;
-
-  // =====================================
-  // RESPAWN
-  // =====================================
-
-  if (newY <= deathY) {
-    const spawnGrounded = isOnPlatform(
-      spawnX,
-      spawnY,
-      playerWidth,
-      playerHeight,
-      platforms
-    );
-
-    return {
-      x: spawnX,
-      y: spawnY,
-      velocityY: 0,
-      // dropTimer: 0,
-      isGrounded: spawnGrounded,
-    };
-  }
-
-  // =====================================
-  // DROP TIMER
-  // =====================================
-
-  // if (dropTimer > 0) {
-  //   dropTimer = Math.max(0, dropTimer - delta);
-  // }
 
   // =====================================
   // PLATFORM COLLISION
   // =====================================
 
-  // if (velocityY <= 0 && dropTimer <= 0) {
-  if (velocityY <= 0) {
-    const hit = checkPlatformCollision(
+  const platformHit =
+    checkPlatformCollision(
       newX,
       newY,
+      prevX,
       prevY,
-      velocityY,
       playerWidth,
       playerHeight,
       platforms
     );
 
-    if (hit.collided) {
-      newY = hit.y;
-      velocityY = 0;
-      isGrounded = true;
-    }
+  newX = platformHit.x;
+  newY = platformHit.y;
+
+  if (platformHit.grounded) {
+    velocityY = 0;
+    isGrounded = true;
   }
 
   // =====================================
   // PARTITION COLLISION
   // =====================================
 
-  const partitionHit = checkPartitionCollision(
-    newX,
-    newY,
-    prevX,
-    prevY,
-    playerWidth,
-    playerHeight,
-    partitions
-  );
+  const partitionHit =
+    checkPartitionCollision(
+      newX,
+      newY,
+      prevX,
+      prevY,
+      playerWidth,
+      playerHeight,
+      partitions
+    );
 
   newX = partitionHit.x;
   newY = partitionHit.y;
+
+  if (partitionHit.grounded) {
+    velocityY = 0;
+    isGrounded = true;
+  }
+
+  // =====================================
+  // RESPAWN
+  // =====================================
+
+  if (newY <= deathY) {
+    return {
+      x: spawnX,
+      y: spawnY,
+      velocityY: 0,
+      isGrounded: false,
+    };
+  }
 
   return {
     x: newX,
     y: newY,
     velocityY,
-    // dropTimer,
     isGrounded,
   };
 };

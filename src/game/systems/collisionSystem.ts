@@ -6,20 +6,19 @@ import type {
 } from "../types/gameTypes";
 
 // =========================================
-// PLATFORM HELPERS
+// PLATFORM
 // =========================================
 
 export const isOnPlatform = (
   playerX: number,
   playerY: number,
   playerWidth: number,
-  playerHeight: number,
+  _playerHeight: number,
   platforms: Platform[]
 ) => {
   const playerLeft = playerX;
   const playerRight = playerX + playerWidth;
   const playerBottom = playerY;
-  const playerTop = playerY + playerHeight;
 
   for (const p of platforms) {
     const platformTop = p.y + p.height;
@@ -28,11 +27,10 @@ export const isOnPlatform = (
       playerRight > p.x &&
       playerLeft < p.x + p.width;
 
-    const touchingY =
-      playerBottom <= platformTop + 4 &&
-      playerTop >= platformTop - 4;
+    const touchingTop =
+      Math.abs(playerBottom - platformTop) <= 2;
 
-    if (withinX && touchingY) {
+    if (withinX && touchingTop) {
       return true;
     }
   }
@@ -40,51 +38,113 @@ export const isOnPlatform = (
   return false;
 };
 
+// =========================================
+// PLATFORM COLLISION
+// =========================================
+
 export const checkPlatformCollision = (
   playerX: number,
   playerY: number,
+  prevX: number,
   prevY: number,
-  velocityY: number,
   playerWidth: number,
   playerHeight: number,
   platforms: Platform[]
 ) => {
-  if (velocityY > 0) {
-    return {
-      collided: false,
-      y: playerY,
-    };
-  }
+  let newX = playerX;
+  let newY = playerY;
 
-  const playerLeft = playerX;
-  const playerRight = playerX + playerWidth;
-
-  let collided = false;
-  let bestY = playerY;
+  let grounded = false;
 
   for (const p of platforms) {
+    const hit =
+      newX + playerWidth > p.x &&
+      newX < p.x + p.width &&
+      newY + playerHeight > p.y &&
+      newY < p.y + p.height;
+
+    if (!hit) continue;
+
+    const prevRight = prevX + playerWidth;
+    const prevLeft = prevX;
+    const prevTop = prevY + playerHeight;
+    const prevBottom = prevY;
+
+    const platformRight = p.x + p.width;
     const platformTop = p.y + p.height;
+
+    // =====================================
+    // ชนจากซ้าย
+    // =====================================
+
+    if (prevRight <= p.x) {
+      newX = p.x - playerWidth;
+    }
+
+    // =====================================
+    // ชนจากขวา
+    // =====================================
+
+    else if (prevLeft >= platformRight) {
+      newX = platformRight;
+    }
+
+    // =====================================
+    // ตกลงด้านบน
+    // =====================================
+
+    else if (prevBottom >= platformTop) {
+      newY = platformTop;
+      grounded = true;
+    }
+
+    // =====================================
+    // ชนด้านล่าง
+    // =====================================
+
+    else if (prevTop <= p.y) {
+      newY = p.y - playerHeight;
+    }
+  }
+
+  return {
+    x: newX,
+    y: newY,
+    grounded,
+  };
+};
+
+// =========================================
+// PARTITION
+// =========================================
+
+export const isOnPartition = (
+  playerX: number,
+  playerY: number,
+  playerWidth: number,
+  _playerHeight: number,
+  partitions: Partition[]
+) => {
+  const playerLeft = playerX;
+  const playerRight = playerX + playerWidth;
+  const playerBottom = playerY;
+
+  for (const p of partitions) {
+    const partitionTop = p.y + p.height;
 
     const withinX =
       playerRight > p.x &&
       playerLeft < p.x + p.width;
 
-    const crossedTop =
-      prevY >= platformTop - 10 &&
-      playerY <= platformTop + 10;
+    const touchingTop =
+      Math.abs(playerBottom - partitionTop) <= 2;
 
-    if (withinX && crossedTop) {
-      if (!collided || platformTop > bestY) {
-        collided = true;
-        bestY = platformTop;
-      }
+    if (withinX && touchingTop) {
+      return true;
     }
   }
 
-  return {
-    collided,
-    y: collided ? bestY : playerY,
-  };
+  return false;
 };
 
 // =========================================
@@ -103,6 +163,8 @@ export const checkPartitionCollision = (
   let newX = playerX;
   let newY = playerY;
 
+  let grounded = false;
+
   for (const wall of partitions) {
     const hit =
       newX + playerWidth > wall.x &&
@@ -117,14 +179,42 @@ export const checkPartitionCollision = (
     const prevTop = prevY + playerHeight;
     const prevBottom = prevY;
 
-    // Prefer resolving by the side the player came from
+    const wallRight =
+      wall.x + wall.width;
+
+    const wallTop =
+      wall.y + wall.height;
+
+    // =====================================
+    // ชนจากซ้าย
+    // =====================================
+
     if (prevRight <= wall.x) {
       newX = wall.x - playerWidth;
-    } else if (prevLeft >= wall.x + wall.width) {
-      newX = wall.x + wall.width;
-    } else if (prevBottom >= wall.y + wall.height) {
-      newY = wall.y + wall.height;
-    } else if (prevTop <= wall.y) {
+    }
+
+    // =====================================
+    // ชนจากขวา
+    // =====================================
+
+    else if (prevLeft >= wallRight) {
+      newX = wallRight;
+    }
+
+    // =====================================
+    // ยืนด้านบน
+    // =====================================
+
+    else if (prevBottom >= wallTop) {
+      newY = wallTop;
+      grounded = true;
+    }
+
+    // =====================================
+    // ชนด้านล่าง
+    // =====================================
+
+    else if (prevTop <= wall.y) {
       newY = wall.y - playerHeight;
     }
   }
@@ -132,11 +222,12 @@ export const checkPartitionCollision = (
   return {
     x: newX,
     y: newY,
+    grounded,
   };
 };
 
 // =========================================
-// TARGET / PORTAL
+// TARGET
 // =========================================
 
 export const checkTargetCollision = (
@@ -155,11 +246,17 @@ export const checkTargetCollision = (
       playerY + playerHeight > t.y &&
       playerY < t.y + t.height;
 
-    if (hit) hits.push(t.id);
+    if (hit) {
+      hits.push(t.id);
+    }
   }
 
   return hits;
 };
+
+// =========================================
+// PORTAL
+// =========================================
 
 export const checkPortalCollision = (
   playerX: number,
@@ -175,7 +272,9 @@ export const checkPortalCollision = (
       playerY + playerHeight > portal.y &&
       playerY < portal.y + portal.height;
 
-    if (hit) return portal;
+    if (hit) {
+      return portal;
+    }
   }
 
   return null;

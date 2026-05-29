@@ -4,7 +4,7 @@ export const GAME_CONFIG = {
   // =====================================
 
   playerWidth: 60,
-  playerHeight: 100,
+  playerHeight: 110,
 
   // =====================================
   // MOVEMENT

@@ -1,13 +1,31 @@
 import type { WorldData } from "../types/gameTypes";
 
-import skyBg from "../../assets/background/sky.jpg";
+import skyBg from "../../assets/background/backgroundSky.png";
+import farMountain from "../../assets/background/farMountain.png";
+import nearMountain from "../../assets/background/nearMoutain.png";
+import landGrass from "../../assets/background/landGrass.png";
 
 export const iceWorld: WorldData = {
   id: "ice-world",
+
   worldWidth: 4200,
-  background: skyBg,
+
+  // =====================================
+  // BACKGROUNDS
+  // =====================================
+
+  skyBackground: skyBg,
+
+  farBackground: farMountain,
+
+  nearBackground: nearMountain,
+
+  landBackground: landGrass,
+
   spawnX: 200,
   spawnY: 60,
+  
+  decorations: [],
 
   platforms: [
     { x: 0, y: 0, width: 800, height: 60 },
@@ -15,10 +33,9 @@ export const iceWorld: WorldData = {
     { x: 1800, y: 420, width: 500, height: 50 },
   ],
 
-   partitions: [
+  partitions: [
     { x: 500, y: 100, width: 500, height: 60 },
   ],
-
 
   targets: [
     {

@@ -43,6 +43,7 @@ export const Popup = ({
 
         animation:
           "fadeIn 0.2s ease",
+        zIndex: 5000,
       }}
     >
       {text}

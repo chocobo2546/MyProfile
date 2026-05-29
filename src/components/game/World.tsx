@@ -1,11 +1,14 @@
 import { Popup } from "./Popup";
 import { Portal } from "./Portal";
 
-import type { WorldData } from "../../game/types/gameTypes";
+import type {
+  WorldData,
+  BackgroundLayer,
+} from "../../game/types/gameTypes";
 
-import skyBg from "../../assets/background/sky.jpg";
-import lavaTexture from "../../assets/platform/lava.png";
-import grassTexture from "../../assets/platform/grass.png";
+import lavaTexture from "../../assets/platform/groundLava.png"; 
+import grassTexture from "../../assets/platform/groundGrass.png"; 
+import rockTexture from "../../assets/platform/groundRock.png"; 
 import signTexture from "../../assets/sign/woodenSign.png";
 
 interface Props {
@@ -15,13 +18,59 @@ interface Props {
   containerWidth: number;
 }
 
+const renderBackgroundLayer = (
+  layer: BackgroundLayer,
+  cameraOffset: number,
+  renderWidth: number,
+  index: number
+) => {
+  return (
+    <div
+      key={`bg-layer-${index}`}
+      style={{
+        position: "absolute",
+
+        left: layer.x ?? 0,
+        bottom: layer.y ?? 0,
+
+        width: renderWidth,
+        height: layer.height ?? "100%",
+
+        backgroundImage: `url(${layer.image})`,
+
+        backgroundRepeat: layer.repeatX
+          ? "repeat-x"
+          : "no-repeat",
+
+        backgroundSize:
+          layer.size ?? "cover",
+
+        backgroundPosition: "bottom left",
+
+        opacity: layer.opacity ?? 1,
+
+        transform: `translate3d(${
+          cameraOffset * (layer.speed ?? 1)
+        }px, 0, 0)`,
+
+        zIndex: layer.zIndex ?? 0,
+
+        pointerEvents: "none",
+      }}
+    />
+  );
+};
+
 export const World = ({
   world,
   cameraOffset,
   activeTargets,
   containerWidth,
 }: Props) => {
-  const renderWidth = Math.max(world.worldWidth, containerWidth);
+  const renderWidth = Math.max(
+    world.worldWidth,
+    containerWidth
+  );
 
   return (
     <div
@@ -30,133 +79,179 @@ export const World = ({
         inset: 0,
         overflow: "hidden",
         pointerEvents: "none",
-        background: "#06101f",
+        background: "#000",
       }}
     >
-      {/* BACKGROUND */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          backgroundImage: `url(${world.background || skyBg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      />
+      {/* ========================================= */}
+      {/* BACKGROUND LAYERS */}
+      {/* ========================================= */}
 
-      {/* FAR PARALLAX */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          transform: `translate3d(${cameraOffset * 0.16}px, 0, 0)`,
-          background:
-            world.farBackground
-              ? `url(${world.farBackground}) center/cover no-repeat`
-              : "linear-gradient(to top, rgba(17,24,39,0.9), rgba(17,24,39,0.0) 70%)",
-          opacity: 0.55,
-          filter: "blur(1px)",
-        }}
-      />
+      {world.backgroundLayers?.map((layer, index) =>
+        renderBackgroundLayer(
+          layer,
+          cameraOffset,
+          renderWidth,
+          index
+        )
+      )}
 
-      {/* NEAR PARALLAX */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          transform: `translate3d(${cameraOffset * 0.32}px, 0, 0)`,
-          background:
-            world.nearBackground
-              ? `url(${world.nearBackground}) center/cover no-repeat`
-              : "linear-gradient(to top, rgba(15,23,42,0.95), rgba(15,23,42,0.0) 60%)",
-          opacity: 0.8,
-        }}
-      />
-
+      {/* ========================================= */}
       {/* WORLD CONTENT */}
+      {/* ========================================= */}
+
       <div
         style={{
           position: "absolute",
           left: 0,
           bottom: 0,
+
           width: renderWidth,
           height: "100%",
-          transform: `translate3d(${cameraOffset}px, 0, 0)`,
+
+          transform: `translate3d(${cameraOffset}px,0,0)`,
+
           willChange: "transform",
-          zIndex: 2,
+
+          zIndex: 100,
         }}
       >
+
+        {/* ========================================= */}
+        {/* DECORATIONS */}
+        {/* ========================================= */}
+
+        {world.decorations.map((d) => (
+          <img
+            key={d.id}
+            src={d.image}
+            alt=""
+            draggable={false}
+            
+            style={{
+              position: "absolute",
+
+              left: d.x,
+              bottom: d.y,
+
+              width: d.width,
+              height: d.height,
+
+              objectFit: "contain",
+
+              pointerEvents: "none",
+              userSelect: "none",
+
+              opacity: d.opacity ?? 1,
+
+              zIndex: d.zIndex ?? 1,
+
+              imageRendering: "auto",
+
+              transform: `translateX(${
+                cameraOffset * (d.parallax ?? 1)
+              }px)`,
+            }}
+          />
+        ))}
+
         {/* GROUND */}
+
         <div
           style={{
             position: "absolute",
             bottom: 0,
+
             width: "100%",
             height: 40,
 
             backgroundImage: `url(${lavaTexture})`,
-            backgroundRepeat: "repeat",
+            backgroundRepeat: "repeat-x",
             backgroundSize: "128px 128px",
-            boxShadow: "0 0 20px rgba(255,100,0,0.6)",
+
+            boxShadow:
+              "0 0 20px rgba(255,100,0,0.6)",
+            zIndex: 50,
           }}
         />
 
         {/* PLATFORMS */}
+
         {world.platforms.map((p, i) => (
           <div
             key={`${p.x}-${p.y}-${i}`}
             style={{
               position: "absolute",
+
               left: p.x,
               bottom: p.y,
+
               width: p.width,
               height: p.height,
 
               backgroundImage: `url(${grassTexture})`,
               backgroundRepeat: "repeat",
-              backgroundSize: "64px 64px",
+              backgroundSize: "256px 72px",
 
-              borderRadius: "15px 15px 20px 20px",
-              boxShadow: "-10px 10px 5px rgba(0,0,0,0.3)",
+              borderRadius:
+                "15px 15px 20px 20px",
+
+              boxShadow:
+                "-10px 10px 5px rgba(0,0,0,0.3)",
+              zIndex: 51,
             }}
           />
         ))}
 
         {/* PARTITIONS */}
+
         {world.partitions.map((p, i) => (
           <div
             key={`partition-${i}`}
             style={{
               position: "absolute",
+
               left: p.x,
               bottom: p.y,
+
               width: p.width,
               height: p.height,
-              backgroundColor: "#444",
-              border: "2px solid #222",
+
+              backgroundImage: `url(${rockTexture})`,
+              backgroundRepeat: "repeat",
+              backgroundSize: "256px 256px",
+
+              borderRadius:
+                "15px 15px 20px 20px",
+
+              boxShadow:
+                "-10px 10px 5px rgba(0,0,0,0.3)",
+              zIndex: 49,
             }}
           />
         ))}
 
         {/* TARGETS */}
+
         {world.targets.map((t) => {
-          const isActive = activeTargets.includes(t.id);
+          const isActive =
+            activeTargets.includes(t.id);
 
           return (
             <div key={t.id}>
               <div
                 style={{
                   position: "absolute",
+
                   left: t.x,
                   bottom: t.y,
+
                   width: t.width,
                   height: t.height,
 
                   backgroundImage: `url(${signTexture})`,
                   backgroundRepeat: "repeat",
-                  backgroundSize: "64px 64px",
-                  backgroundPosition: "center",
+                  backgroundSize: "76px 76px",
+                  zIndex: 52,
                 }}
               />
 
@@ -172,12 +267,16 @@ export const World = ({
         })}
 
         {/* PORTALS */}
+
         {world.portals.map((portal) => (
           <Portal
             key={portal.id}
             x={portal.x}
             y={portal.y}
-            label={portal.label ?? portal.targetWorld}
+            label={
+              portal.label ??
+              portal.targetWorld
+            }
           />
         ))}
       </div>
