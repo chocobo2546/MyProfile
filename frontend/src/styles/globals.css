@@ -42,7 +42,6 @@ button:focus-visible {
     opacity: 0;
     transform: translateY(8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -53,11 +52,9 @@ button:focus-visible {
   0% {
     transform: translateY(0);
   }
-
   50% {
     transform: translateY(-6px);
   }
-
   100% {
     transform: translateY(0);
   }

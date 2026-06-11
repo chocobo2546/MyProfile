@@ -1,55 +1,41 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useKeyboard } from "../../hooks/useKeyboard";
-import { GAME_CONFIG } from "../../config/gameConfig";
 import { CONTROLS } from "./engine/InputManager";
-
-import { updatePlayer } from "./systems/MovementSystem";
-import { smoothCamera, updateCameraTarget } from "./engine/CameraManager";
-import { checkPortalCollision, checkTargetCollision } from "./systems/CollisionSystem";
-
 import { lavaWorld } from "./data/worlds/lavaWorld";
 import { iceWorld } from "./data/worlds/iceWorld";
 import type { WorldData } from "./types/gameTypes";
-
 import { PlayerRenderer } from "./rendering/PlayerRenderer";
 import { Renderer } from "./rendering/Renderer";
 import { Navbar } from "./Navbar";
 import { ControlsHint } from "./ControlsHint";
+import { useGameUIStore } from "../../store/gameUIStore";
+import { useWorldStore, type WorldId } from "../../store/worldStore";
+import { useGameLoop } from "./hooks/useGameLoop";
+import { usePlayerControls } from "./hooks/usePlayerControls";
 
 interface Props {
   onBack: () => void;
   onOpenDownloads: () => void;
 }
 
-type WorldId = "lava-world" | "ice-world";
-
 const WORLDS: Record<WorldId, WorldData> = {
   "lava-world": lavaWorld,
   "ice-world": iceWorld,
 };
 
-const formatWorldLabel = (id: string) =>
-  id
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+const formatWorldLabel = (id: string): string =>
+  id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-export const GameCanvas = ({
-  onBack,
-  onOpenDownloads,
-}: Props) => {
+export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
   const keys = useKeyboard();
+  const { hideUI, toggleHideUI } = useGameUIStore();
+  const { worldId, setWorldId } = useWorldStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const lastTimeRef = useRef<number>(0);
-  const keysRef = useRef(keys);
-  const previousKeysRef = useRef<Set<string>>(new Set());
+  const cameraOffsetRef = useRef<number>(0);
 
-  const cameraOffsetRef = useRef(0);
-
-  const facingRef = useRef<"left" | "right">("right");
-
-  const [worldId, setWorldId] = useState<WorldId>("lava-world");
+  const { keysRef, facingRef } = usePlayerControls({ keys, toggleHideUI });
 
   const currentWorld = WORLDS[worldId] ?? lavaWorld;
 
@@ -60,167 +46,49 @@ export const GameCanvas = ({
     isGrounded: true,
   });
 
-  const [cameraOffset, setCameraOffset] = useState(0);
-
+  const [cameraOffset, setCameraOffset] = useState<number>(0);
   const [activeTargets, setActiveTargets] = useState<string[]>([]);
-
   const [renderState, setRenderState] = useState({
     x: currentWorld.spawnX,
     y: currentWorld.spawnY,
   });
 
-  const [hideUI, setHideUI] = useState(false);
-
-  // =========================================
-  // KEYBOARD
-  // =========================================
-
+  // Reset world state when worldId changes (portal transition)
   useEffect(() => {
-    keysRef.current = keys;
+    const newWorld = WORLDS[worldId];
+    if (!newWorld) return;
 
-    if (keys.has(CONTROLS.moveLeft)) {
-      facingRef.current = "left";
-    }
+    cameraOffsetRef.current = 0;
+    setCameraOffset(0);
 
-    if (keys.has(CONTROLS.moveRight)) {
-      facingRef.current = "right";
-    }
-
-    const wasHidePressed = previousKeysRef.current.has(CONTROLS.hideUI);
-    const isHidePressed = keys.has(CONTROLS.hideUI);
-
-    if (isHidePressed && !wasHidePressed) {
-      setHideUI((prev) => !prev);
-    }
-
-    previousKeysRef.current = keys;
-  }, [keys]);
-
-  // =========================================
-  // GAME LOOP
-  // =========================================
-
-  useEffect(() => {
-    let animationId = 0;
-
-    const loop = (time: number) => {
-      const delta = !lastTimeRef.current
-        ? 1
-        : Math.min((time - lastTimeRef.current) / 16, 2);
-
-      lastTimeRef.current = time;
-
-      const isSprinting =
-        keysRef.current.has(CONTROLS.run) ||
-        keysRef.current.has("ShiftRight");
-
-      const speed =
-        GAME_CONFIG.speed *
-        (isSprinting ? GAME_CONFIG.sprintMultiplier : 1) *
-        delta;
-
-      const current = playerRef.current;
-
-      const newState = updatePlayer({
-        player: current,
-        keys: keysRef.current,
-        speed,
-        worldWidth: currentWorld.worldWidth,
-        gravity: GAME_CONFIG.gravity,
-        jumpForce: GAME_CONFIG.jumpForce,
-        deathY: GAME_CONFIG.deathY,
-        spawnX: currentWorld.spawnX,
-        spawnY: currentWorld.spawnY,
-        playerWidth: GAME_CONFIG.playerWidth,
-        playerHeight: GAME_CONFIG.playerHeight,
-        platforms: currentWorld.platforms,
-        partitions: currentWorld.partitions,
-        _delta: delta,
-      });
-
-      playerRef.current = newState;
-
-      const targetHits = checkTargetCollision(
-        newState.x,
-        newState.y,
-        GAME_CONFIG.playerWidth,
-        GAME_CONFIG.playerHeight,
-        currentWorld.targets
-      );
-
-      setActiveTargets(targetHits);
-
-      const portalHit = checkPortalCollision(
-        newState.x,
-        newState.y,
-        GAME_CONFIG.playerWidth,
-        GAME_CONFIG.playerHeight,
-        currentWorld.portals
-      );
-
-      if (portalHit) {
-        const nextWorld = WORLDS[portalHit.targetWorld as WorldId];
-
-        if (nextWorld && nextWorld.id !== currentWorld.id) {
-          setWorldId(nextWorld.id as WorldId);
-
-          cameraOffsetRef.current = 0;
-          setCameraOffset(0);
-
-          const nextSpawn = {
-            x: nextWorld.spawnX,
-            y: nextWorld.spawnY,
-            velocityY: 0,
-            isGrounded: true,
-          };
-
-          playerRef.current = nextSpawn;
-          setRenderState({
-            x: nextSpawn.x,
-            y: nextSpawn.y,
-          });
-          setActiveTargets([]);
-
-          animationId = requestAnimationFrame(loop);
-          return;
-        }
-      }
-
-      const containerWidth =
-        containerRef.current?.offsetWidth || 0;
-
-      const targetOffset = updateCameraTarget(
-        newState.x,
-        cameraOffsetRef.current,
-        containerWidth,
-        currentWorld.worldWidth,
-        GAME_CONFIG.deadZoneLeft,
-        GAME_CONFIG.deadZoneRight
-      );
-
-      const nextCamera = smoothCamera(
-        cameraOffsetRef.current,
-        targetOffset,
-        GAME_CONFIG.cameraLerp
-      );
-
-      cameraOffsetRef.current = nextCamera;
-      setCameraOffset(nextCamera);
-
-      setRenderState({
-        x: newState.x,
-        y: newState.y,
-      });
-
-      animationId = requestAnimationFrame(loop);
+    playerRef.current = {
+      x: newWorld.spawnX,
+      y: newWorld.spawnY,
+      velocityY: 0,
+      isGrounded: true,
     };
 
-    animationId = requestAnimationFrame(loop);
+    setRenderState({
+      x: newWorld.spawnX,
+      y: newWorld.spawnY,
+    });
+    setActiveTargets([]);
+  }, [worldId]);
 
-    return () => cancelAnimationFrame(animationId);
-  }, [currentWorld.id]);
+  // Game loop
+  useGameLoop({
+    containerRef,
+    keysRef,
+    currentWorld,
+    playerRef,
+    cameraOffsetRef,
+    facingRef,
+    setCameraOffset,
+    setActiveTargets,
+    setRenderState,
+  });
 
-  const containerWidth = containerRef.current?.offsetWidth || 0;
+  const containerWidth = containerRef.current?.offsetWidth ?? 0;
 
   return (
     <div
@@ -254,14 +122,8 @@ export const GameCanvas = ({
         cameraOffset={cameraOffset}
         velocityY={playerRef.current.velocityY}
         isGrounded={playerRef.current.isGrounded}
-        isMoving={
-          keys.has(CONTROLS.moveLeft) ||
-          keys.has(CONTROLS.moveRight)
-        }
-        isRunning={
-          keys.has(CONTROLS.run) ||
-          keys.has("ShiftRight")
-        }
+        isMoving={keys.has(CONTROLS.moveLeft) || keys.has(CONTROLS.moveRight)}
+        isRunning={keys.has(CONTROLS.run) || keys.has("ShiftRight")}
         facing={facingRef.current}
       />
 

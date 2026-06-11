@@ -7,29 +7,22 @@ import landGrass from "../../../../assets/backgrounds/landGrass.png";
 
 export const iceWorld: WorldData = {
   id: "ice-world",
-
   worldWidth: 4200,
-
   skyBackground: skyBg,
   farBackground: farMountain,
   nearBackground: nearMountain,
   landBackground: landGrass,
-
   spawnX: 200,
   spawnY: 60,
-
   decorations: [],
-
   platforms: [
     { x: 0, y: 0, width: 800, height: 60 },
     { x: 1000, y: 220, width: 400, height: 50 },
     { x: 1800, y: 420, width: 500, height: 50 },
   ],
-
   partitions: [
     { x: 500, y: 100, width: 500, height: 60 },
   ],
-
   targets: [
     {
       id: "ice",
@@ -43,7 +36,6 @@ export const iceWorld: WorldData = {
         "different projects and themes.",
     },
   ],
-
   portals: [
     {
       id: "to-lava",

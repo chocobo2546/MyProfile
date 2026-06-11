@@ -9,17 +9,13 @@ import treeBig from "../../../../assets/decorations/bigTree.png";
 
 export const lavaWorld: WorldData = {
   id: "lava-world",
-
   worldWidth: 3000,
-
   skyBackground: skyBg,
   farBackground: farMountain,
   nearBackground: nearMountain,
   landBackground: landGrass,
-
   spawnX: 200,
   spawnY: 500,
-
   backgroundLayers: [
     {
       image: skyBg,
@@ -63,7 +59,6 @@ export const lavaWorld: WorldData = {
       zIndex: 4,
     },
   ],
-
   decorations: [
     {
       id: "tree-1",
@@ -76,17 +71,14 @@ export const lavaWorld: WorldData = {
       parallax: 0.05,
     },
   ],
-
   platforms: [
     { x: -10, y: 50, width: 3000, height: 60 },
     { x: 800, y: 150, width: 500, height: 60 },
     { x: 1500, y: 300, width: 400, height: 60 },
   ],
-
   partitions: [
     { x: -10, y: 0, width: 3000, height: 50 },
   ],
-
   targets: [
     {
       id: "welcome",
@@ -100,7 +92,6 @@ export const lavaWorld: WorldData = {
         "my projects and skills.",
     },
   ],
-
   portals: [
     {
       id: "to-ice",

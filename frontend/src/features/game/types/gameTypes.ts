@@ -33,57 +33,37 @@ export type Portal = {
 
 export type Decoration = {
   id: string;
-
   x: number;
   y: number;
-
   width: number;
   height: number;
-
   image: string;
-
   zIndex?: number;
-
   opacity?: number;
-
   parallax?: number;
 };
 
 export type BackgroundLayer = {
   image: string;
-
   speed?: number;
-
   y?: number;
   x?: number;
-
   height?: number;
-
   opacity?: number;
-
   repeatX?: boolean;
-
   size?: string;
-
   zIndex?: number;
 };
 
 export type WorldData = {
   id: "lava-world" | "ice-world" | string;
-
   worldWidth: number;
-
   skyBackground: string;
-
   farBackground?: string;
-
   nearBackground?: string;
-
   landBackground?: string;
-
   spawnX: number;
   spawnY: number;
-
   backgroundLayers?: BackgroundLayer[];
   platforms: Platform[];
   partitions: Partition[];
@@ -95,9 +75,7 @@ export type WorldData = {
 export type PlayerState = {
   x: number;
   y: number;
-
   velocityY: number;
-
   isGrounded: boolean;
 };
 

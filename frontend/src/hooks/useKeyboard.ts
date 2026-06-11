@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
 
-export const useKeyboard = () => {
+export const useKeyboard = (): Set<string> => {
   const [keys, setKeys] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.repeat) return;
-
-      setKeys((prev) => {
-        const next = new Set(prev);
-        next.add(e.code);
-        return next;
-      });
+      setKeys((prev) => new Set(prev).add(e.code));
     };
 
     const up = (e: KeyboardEvent) => {

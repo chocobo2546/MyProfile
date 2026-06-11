@@ -1,4 +1,5 @@
 import { Button } from "../../components/ui/Button";
+import { useDownload } from "../../hooks/useDownload";
 
 interface Props {
   onBack: () => void;
@@ -8,25 +9,12 @@ const DOWNLOADS = [
   {
     title: "Profile PDF",
     description: "Clean professional profile file.",
-    // filePath: "/downloads/profile.pdf",
-    filePath: "/resume/forTest.pdf", // for test download
-
+    filePath: "/resume/forTest.pdf",
   },
 ];
 
 export const DownloadsView = ({ onBack }: Props) => {
-  const viewFile = (path: string) => {
-    window.open(path, "_blank", "noopener,noreferrer");
-  };
-
-  const downloadFile = (path: string, title: string) => {
-    const a = document.createElement("a");
-    a.href = path;
-    a.download = title.replace(/\s+/g, "_") + ".pdf";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+  const { view, download } = useDownload();
 
   return (
     <div
@@ -103,7 +91,7 @@ export const DownloadsView = ({ onBack }: Props) => {
 
               <div style={{ display: "flex", gap: 10 }}>
                 <Button
-                  onClick={() => viewFile(item.filePath)}
+                  onClick={() => view(item.filePath)}
                   variant="secondary"
                   width="50%"
                   height={44}
@@ -112,7 +100,7 @@ export const DownloadsView = ({ onBack }: Props) => {
                 </Button>
 
                 <Button
-                  onClick={() => downloadFile(item.filePath, item.title)}
+                  onClick={() => download(item.filePath, item.title)}
                   variant="primary"
                   width="50%"
                   height={44}
