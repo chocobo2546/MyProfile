@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { GAME_CONFIG } from "../../../config/gameConfig";
 import {
   PLAYER_ANIMATIONS,
@@ -25,6 +26,8 @@ export const PlayerRenderer = ({
   isRunning,
   facing,
 }: Props) => {
+  const [frameIndex, setFrameIndex] = useState(0);
+
   const state = resolveAnimationState({
     isGrounded,
     velocityY,
@@ -34,12 +37,15 @@ export const PlayerRenderer = ({
 
   const animation = PLAYER_ANIMATIONS[state];
 
-  const currentFrameIndex =
-    Math.floor(
-      performance.now() / (1000 / animation.fps)
-    ) % animation.frames.length;
+  useEffect(() => {
+    const interval = 1000 / animation.fps;
+    const id = setInterval(() => {
+      setFrameIndex((prev) => (prev + 1) % animation.frames.length);
+    }, interval);
+    return () => clearInterval(id);
+  }, [animation.fps, animation.frames.length]);
 
-  const frame = animation.frames[currentFrameIndex];
+  const frame = animation.frames[frameIndex % animation.frames.length];
 
   return (
     <div

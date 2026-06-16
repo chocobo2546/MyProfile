@@ -49,6 +49,10 @@ export const ControlsHint = () => {
         <strong>{toLabel(CONTROLS.hideUI)}</strong>
         {" = Hide UI"}
       </div>
+      <div>
+        <strong>{toLabel(CONTROLS.interact)}</strong>
+        {" = Interact / Next"}
+      </div>
     </div>
   );
 };

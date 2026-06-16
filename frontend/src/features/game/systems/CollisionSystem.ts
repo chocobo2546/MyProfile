@@ -1,4 +1,4 @@
-import type { Platform, Partition, Target, Portal } from "../types/gameTypes";
+import type { Platform, Partition, Target, Portal, Npc } from "../types/gameTypes";
 
 export const isOnPlatform = (
   playerX: number,
@@ -131,6 +131,25 @@ export const checkTargetCollision = (
       playerY + playerHeight > t.y &&
       playerY < t.y + t.height;
     if (hit) hits.push(t.id);
+  }
+  return hits;
+};
+
+export const checkNpcCollision = (
+  playerX: number,
+  playerY: number,
+  playerWidth: number,
+  playerHeight: number,
+  npcs: Npc[]
+): string[] => {
+  const hits: string[] = [];
+  for (const n of npcs) {
+    const hit =
+      playerX + playerWidth > n.x &&
+      playerX < n.x + n.width &&
+      playerY + playerHeight > n.y &&
+      playerY < n.y + n.height;
+    if (hit) hits.push(n.id);
   }
   return hits;
 };

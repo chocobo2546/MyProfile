@@ -3,12 +3,12 @@ import { GAME_CONFIG } from "../../../config/gameConfig";
 import { CONTROLS } from "../engine/InputManager";
 import { updatePlayer } from "../systems/MovementSystem";
 import { smoothCamera, updateCameraTarget } from "../engine/CameraManager";
-import { checkPortalCollision, checkTargetCollision } from "../systems/CollisionSystem";
+import { checkPortalCollision, checkTargetCollision, checkNpcCollision } from "../systems/CollisionSystem";
 import { type WorldData } from "../types/gameTypes";
 import { type WorldId, useWorldStore } from "../../../store/worldStore";
 
 interface UseGameLoopParams {
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
   keysRef: React.MutableRefObject<Set<string>>;
   currentWorld: WorldData;
   playerRef: React.MutableRefObject<{
@@ -21,7 +21,8 @@ interface UseGameLoopParams {
   facingRef: React.MutableRefObject<"left" | "right">;
   setCameraOffset: (offset: number) => void;
   setActiveTargets: (targets: string[]) => void;
-  setRenderState: (state: { x: number; y: number }) => void;
+  setActiveNpcs: (npcs: string[]) => void;
+  setRenderState: (state: { x: number; y: number; velocityY: number; isGrounded: boolean; facing: "left" | "right" }) => void;
 }
 
 export const useGameLoop = ({
@@ -33,6 +34,7 @@ export const useGameLoop = ({
   facingRef,
   setCameraOffset,
   setActiveTargets,
+  setActiveNpcs,
   setRenderState,
 }: UseGameLoopParams): void => {
   const { setWorldId } = useWorldStore();
@@ -85,6 +87,15 @@ export const useGameLoop = ({
       );
       setActiveTargets(targetHits);
 
+      const npcHits = checkNpcCollision(
+        newState.x,
+        newState.y,
+        GAME_CONFIG.playerWidth,
+        GAME_CONFIG.playerHeight,
+        currentWorld.npcs ?? []
+      );
+      setActiveNpcs(npcHits);
+
       const portalHit = checkPortalCollision(
         newState.x,
         newState.y,
@@ -120,7 +131,7 @@ export const useGameLoop = ({
 
       cameraOffsetRef.current = nextCamera;
       setCameraOffset(nextCamera);
-      setRenderState({ x: newState.x, y: newState.y });
+      setRenderState({ x: newState.x, y: newState.y, velocityY: newState.velocityY, isGrounded: newState.isGrounded, facing: facingRef.current });
 
       animationIdRef.current = requestAnimationFrame(loop);
     };
@@ -132,5 +143,5 @@ export const useGameLoop = ({
         cancelAnimationFrame(animationIdRef.current);
       }
     };
-  }, [currentWorld.id, setWorldId, containerRef, keysRef, playerRef, cameraOffsetRef, facingRef, setCameraOffset, setActiveTargets, setRenderState]);
+  }, [currentWorld, setWorldId, containerRef, keysRef, playerRef, cameraOffsetRef, facingRef, setCameraOffset, setActiveTargets, setActiveNpcs, setRenderState]);
 };

@@ -4,4 +4,5 @@ export const CONTROLS = {
   run: "ShiftLeft",
   jump: "Space",
   hideUI: "KeyH",
+  interact: "KeyF",
 } as const;

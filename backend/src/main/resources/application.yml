@@ -11,3 +11,18 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: when-authorized
+
+spring.jpa.properties.hibernate.cache.use_second_level_cache: true
+spring.jpa.properties.hibernate.cache.region.factory_class: jcache
+spring.jpa.properties.hibernate.cache.use_query_cache: true
+spring.jpa.properties.hibernate.generate_statistics: false

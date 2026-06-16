@@ -17,6 +17,7 @@ public class ApiResponse<T> {
     private boolean success;
     private String message;
     private T data;
+    private PaginationInfo pagination;
     private List<ValidationError> errors;
 
     @Data
@@ -33,6 +34,15 @@ public class ApiResponse<T> {
                 .success(true)
                 .message(message)
                 .data(data)
+                .build();
+    }
+
+    public static <T> ApiResponse<T> success(String message, T data, PaginationInfo pagination) {
+        return ApiResponse.<T>builder()
+                .success(true)
+                .message(message)
+                .data(data)
+                .pagination(pagination)
                 .build();
     }
 

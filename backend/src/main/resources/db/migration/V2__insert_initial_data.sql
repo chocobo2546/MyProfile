@@ -6,11 +6,11 @@ ON CONFLICT (name) DO NOTHING;
 
 -- ============================================
 -- INSERT DEFAULT ADMIN USER
--- Password: "admin123" hashed with BCrypt
--- Hash: $2a$10$uv6PceOu1SLZxnhKVM8UMenaecr/DdojdTOO/sw452xgqMLuVmSsa
+-- Password: "mai_bork" hashed with BCrypt
+-- hasd true : $2a$10$FBchxO2YCws9VvjskqZ5G.2s0UKQwTG765V178HD2e9A2lBbuHlBG
 -- ============================================
 INSERT INTO users (email, password, role_id, created_at, updated_at)
-SELECT 'admin@gameportfolio.com', '$2a$10$uv6PceOu1SLZxnhKVM8UMenaecr/DdojdTOO/sw452xgqMLuVmSsa', r.id, NOW(), NOW()
+SELECT 'admin@gameportfolio.com', '$2a$10$FBchxO2YCws9VvjskqZ5G.2s0UKQwTG765V178HD2e9A2lBbuHlBG', r.id, NOW(), NOW()
 FROM roles r WHERE r.name = 'ROLE_ADMIN'
 ON CONFLICT (email) DO NOTHING;
 

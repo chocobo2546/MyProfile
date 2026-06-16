@@ -34,7 +34,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProjectResponse>> createProject(@Valid @RequestBody CreateProjectRequest request) {
         ProjectResponse created = projectService.createProject(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -42,7 +42,7 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<ProjectResponse>> updateProject(@PathVariable Long id,
                                                                       @Valid @RequestBody UpdateProjectRequest request) {
         ProjectResponse updated = projectService.updateProject(id, request);
@@ -50,7 +50,7 @@ public class ProjectController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Void>> deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)

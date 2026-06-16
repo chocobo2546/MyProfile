@@ -1,7 +1,9 @@
 package backendProfile.gameProfile.config;
 
+import backendProfile.gameProfile.common.filter.VisitorTrackingFilter;
 import backendProfile.gameProfile.security.JwtAuthenticationFilter;
 import backendProfile.gameProfile.security.UnauthorizedEntryPoint;
+import static org.springframework.security.config.Customizer.withDefaults;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,17 +21,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)  // ADD THIS LINE for @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UnauthorizedEntryPoint unauthorizedEntryPoint;
+    private final VisitorTrackingFilter visitorTrackingFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configure(http))
+                .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -37,10 +40,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/projects/**").permitAll()
                         .requestMatchers("/api/v1/resume").permitAll()
                         .requestMatchers("/api/v1/npc/**").permitAll()
+                        .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedEntryPoint))
+                .addFilterBefore(visitorTrackingFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

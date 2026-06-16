@@ -1,6 +1,7 @@
-package backendProfile.gameProfile.modules.analytics.entity;
+package backendProfile.gameProfile.modules.download.entity;
 
 import backendProfile.gameProfile.modules.auth.entity.User;
+import backendProfile.gameProfile.modules.analytics.entity.Visitor;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;

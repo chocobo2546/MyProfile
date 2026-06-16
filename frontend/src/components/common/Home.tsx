@@ -1,79 +1,96 @@
-import { Button } from "../ui/Button";
-
 interface Props {
   onStart: () => void;
-  onDownloads: () => void;
 }
 
-export const Home = ({ onStart, onDownloads }: Props) => {
+export const Home = ({ onStart }: Props) => {
   return (
     <div
       style={{
-        width: "100%",
-        height: "100vh",
+        position: "relative",
+        minHeight: "calc(100vh - 64px)",
         display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center",
-        background:
-          "radial-gradient(circle at top, rgba(37,99,235,0.25), transparent 45%), linear-gradient(to bottom, #020617, #111827)",
-        color: "white",
-        padding: 24,
+        justifyContent: "center",
+        overflow: "hidden",
       }}
     >
       <div
         style={{
-          maxWidth: 860,
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse at 30% 50%, rgba(0,200,83,.08), transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(0,200,83,.04), transparent 60%)",
+          zIndex: 0,
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
           textAlign: "center",
-          animation: "fadeIn 0.35s ease",
+          padding: "2rem",
         }}
       >
         <h1
           style={{
-            fontSize: "clamp(44px, 7vw, 68px)",
-            marginBottom: 18,
-            lineHeight: 1.02,
-            fontWeight: 900,
+            fontSize: "clamp(2.5rem, 6vw, 5rem)",
+            fontWeight: 800,
+            lineHeight: 1.1,
+            marginBottom: "1rem",
           }}
         >
-          Interactive Portfolio
+          <span style={{ color: "#00c853" }}>Welcome</span>
+          <br />
+          This all my story
         </h1>
 
-        <p
+        <button
+          onClick={onStart}
           style={{
-            fontSize: 18,
-            opacity: 0.78,
-            lineHeight: 1.7,
-            maxWidth: 720,
-            margin: "0 auto 34px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: ".5rem",
+            padding: "1rem 2.5rem",
+            borderRadius: 8,
+            border: "none",
+            fontSize: "1rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            background: "#00c853",
+            color: "#000",
+            transition: "all .3s cubic-bezier(.16,1,.3,1)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "#00a844";
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,200,83,.25)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "#00c853";
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "none";
           }}
         >
-          Explore my projects like a game, open the downloads page,
-          and move through the world to see experience, skills, and
-          work samples.
-        </p>
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "center",
-            gap: 14,
-          }}
-        >
-          <Button onClick={onStart} width={180} height={52}>
-            Start Journey
-          </Button>
-
-          <Button
-            onClick={onDownloads}
-            variant="secondary"
-            width={180}
-            height={52}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
           >
-            Downloads
-          </Button>
-        </div>
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          Start My Story
+        </button>
       </div>
     </div>
   );

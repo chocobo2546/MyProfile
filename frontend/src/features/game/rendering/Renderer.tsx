@@ -1,5 +1,6 @@
 import { Popup } from "./ChatBubbleRenderer";
 import { PortalRenderer } from "./PortalRenderer";
+import { NpcRenderer } from "./NpcRenderer";
 
 import type {
   WorldData,
@@ -15,6 +16,8 @@ interface Props {
   world: WorldData;
   cameraOffset: number;
   activeTargets: string[];
+  activeNpcs: string[];
+  npcDialogueIndex: Record<string, number>;
   containerWidth: number;
 }
 
@@ -52,6 +55,8 @@ export const Renderer = ({
   world,
   cameraOffset,
   activeTargets,
+  activeNpcs,
+  npcDialogueIndex,
   containerWidth,
 }: Props) => {
   const renderWidth = Math.max(world.worldWidth, containerWidth);
@@ -195,6 +200,18 @@ export const Renderer = ({
             label={portal.label ?? portal.targetWorld}
           />
         ))}
+
+        {world.npcs?.map((npc) => {
+          const isActive = activeNpcs.includes(npc.id);
+          return (
+            <NpcRenderer
+              key={npc.id}
+              npc={npc}
+              isActive={isActive}
+              dialogueIndex={isActive ? (npcDialogueIndex[npc.id] ?? 0) : 0}
+            />
+          );
+        })}
       </div>
     </div>
   );

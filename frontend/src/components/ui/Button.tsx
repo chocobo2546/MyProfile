@@ -40,24 +40,28 @@ export const Button = ({
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        border: "none",
-        borderRadius: 12,
+        gap: 8,
+        border: isPrimary ? "none" : "1px solid rgba(255,255,255,0.12)",
+        borderRadius: 8,
         cursor: disabled ? "not-allowed" : "pointer",
         fontSize,
-        fontWeight: 700,
+        fontWeight: 600,
         letterSpacing: "0.01em",
-        color: "white",
-        background: isPrimary
-          ? "linear-gradient(135deg,#2563eb,#7c3aed)"
-          : "rgba(255,255,255,0.10)",
-        boxShadow: isPrimary
-          ? "0 10px 24px rgba(37,99,235,0.25)"
-          : "0 8px 18px rgba(0,0,0,0.24)",
-        backdropFilter: "blur(10px)",
-        transition:
-          "transform 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease, background 0.18s ease",
+        color: isPrimary ? "#000" : hovered && !disabled ? "#00c853" : "#e0e0e0",
+        background: isPrimary ? "#00c853" : "transparent",
+        borderColor: isPrimary
+          ? undefined
+          : hovered && !disabled
+          ? "#00c853"
+          : "rgba(255,255,255,0.12)",
+        boxShadow:
+          isPrimary && hovered && !disabled
+            ? "0 8px 24px rgba(0,200,83,0.25)"
+            : "none",
+        transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
         opacity: disabled ? 0.6 : 1,
-        transform: hovered && !disabled ? "translateY(-2px)" : "translateY(0)",
+        transform:
+          hovered && !disabled ? "translateY(-2px)" : "translateY(0)",
         ...style,
       }}
     >

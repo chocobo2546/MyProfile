@@ -1,8 +1,8 @@
-import { viewFile, downloadFile } from "../services/downloadService";
+import { downloadFile, viewResume } from "../services/downloadService";
 
 export const useDownload = () => {
   return {
-    view: viewFile,
-    download: downloadFile,
+    view: async () => viewResume(),
+    download: async (title: string) => downloadFile(title),
   };
 };

@@ -103,4 +103,32 @@ export const lavaWorld: WorldData = {
       label: "Ice World",
     },
   ],
+  npcs: [
+    {
+      id: "blaze",
+      name: "Blaze",
+      x: 400,
+      y: 110,
+      width: 48,
+      height: 60,
+      dialogues: [
+        { sequence: 1, message: "Welcome to Lava World, adventurer!" },
+        { sequence: 2, message: "The ground is scorching hot, so watch your step." },
+        { sequence: 3, message: "Reach the end to claim your reward." },
+      ],
+    },
+    {
+      id: "ignis",
+      name: "Ignis",
+      x: 1100,
+      y: 210,
+      width: 48,
+      height: 60,
+      dialogues: [
+        { sequence: 1, message: "I am Ignis, keeper of the flame." },
+        { sequence: 2, message: "The volcano is restless today." },
+        { sequence: 3, message: "Only the brave cross the fire pits ahead." },
+      ],
+    },
+  ],
 };

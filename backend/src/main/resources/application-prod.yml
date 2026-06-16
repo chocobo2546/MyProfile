@@ -17,6 +17,18 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:86400000}
 
+cookie:
+  secure: true
+
+spring.data.redis:
+  url: ${REDIS_URL}
+
+app:
+  resume:
+    upload-dir: ${UPLOAD_DIR:/opt/render/project/src/uploads/resumes}
+  visitor-tracking:
+    enabled: true
+
 cors:
   allowed-origins: ${FRONTEND_URL:https://your-frontend.com}
 

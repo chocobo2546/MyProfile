@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from "react";
 
 import { useKeyboard } from "../../hooks/useKeyboard";
 import { CONTROLS } from "./engine/InputManager";
@@ -30,12 +30,10 @@ const formatWorldLabel = (id: string): string =>
 export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
   const keys = useKeyboard();
   const { hideUI, toggleHideUI } = useGameUIStore();
-  const { worldId, setWorldId } = useWorldStore();
+  const { worldId } = useWorldStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const cameraOffsetRef = useRef<number>(0);
-
-  const { keysRef, facingRef } = usePlayerControls({ keys, toggleHideUI });
 
   const currentWorld = WORLDS[worldId] ?? lavaWorld;
 
@@ -48,18 +46,37 @@ export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
 
   const [cameraOffset, setCameraOffset] = useState<number>(0);
   const [activeTargets, setActiveTargets] = useState<string[]>([]);
+  const [activeNpcs, setActiveNpcs] = useState<string[]>([]);
+  const [npcDialogueIndex, setNpcDialogueIndex] = useState<Record<string, number>>({});
   const [renderState, setRenderState] = useState({
     x: currentWorld.spawnX,
     y: currentWorld.spawnY,
+    velocityY: 0,
+    isGrounded: true,
+    facing: "right" as "left" | "right",
   });
+  const [containerWidth, setContainerWidth] = useState<number>(0);
+
+  const handleInteract = useCallback(() => {
+    if (activeNpcs.length === 0) return;
+    const npcId = activeNpcs[0];
+    const currentNpc = currentWorld.npcs?.find((n) => n.id === npcId);
+    if (!currentNpc?.dialogues?.length) return;
+    const maxIndex = currentNpc.dialogues.length - 1;
+    setNpcDialogueIndex((prev) => ({
+      ...prev,
+      [npcId]: ((prev[npcId] ?? 0) + 1) % (maxIndex + 1),
+    }));
+  }, [activeNpcs, currentWorld.npcs]);
+
+  const { keysRef, facingRef } = usePlayerControls({ keys, toggleHideUI, onInteract: handleInteract });
 
   // Reset world state when worldId changes (portal transition)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const newWorld = WORLDS[worldId];
     if (!newWorld) return;
 
     cameraOffsetRef.current = 0;
-    setCameraOffset(0);
 
     playerRef.current = {
       x: newWorld.spawnX,
@@ -68,12 +85,50 @@ export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
       isGrounded: true,
     };
 
+    setCameraOffset(0);
     setRenderState({
       x: newWorld.spawnX,
       y: newWorld.spawnY,
+      velocityY: 0,
+      isGrounded: true,
+      facing: "right",
     });
     setActiveTargets([]);
+    setActiveNpcs([]);
+    setNpcDialogueIndex({});
   }, [worldId]);
+
+  // Track container width via ResizeObserver
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    setContainerWidth(el.offsetWidth);
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        setContainerWidth(entry.contentRect.width);
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Reset dialogue index when nearby NPCs change
+  useEffect(() => {
+    setNpcDialogueIndex((prev) => {
+      const next = { ...prev };
+      for (const id of Object.keys(next)) {
+        if (!activeNpcs.includes(id)) {
+          delete next[id];
+        }
+      }
+      for (const id of activeNpcs) {
+        if (!(id in next)) {
+          next[id] = 0;
+        }
+      }
+      return next;
+    });
+  }, [activeNpcs]);
 
   // Game loop
   useGameLoop({
@@ -85,10 +140,9 @@ export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
     facingRef,
     setCameraOffset,
     setActiveTargets,
+    setActiveNpcs,
     setRenderState,
   });
-
-  const containerWidth = containerRef.current?.offsetWidth ?? 0;
 
   return (
     <div
@@ -113,6 +167,8 @@ export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
         world={currentWorld}
         cameraOffset={cameraOffset}
         activeTargets={activeTargets}
+        activeNpcs={activeNpcs}
+        npcDialogueIndex={npcDialogueIndex}
         containerWidth={containerWidth}
       />
 
@@ -120,11 +176,11 @@ export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
         x={renderState.x}
         y={renderState.y}
         cameraOffset={cameraOffset}
-        velocityY={playerRef.current.velocityY}
-        isGrounded={playerRef.current.isGrounded}
+        velocityY={renderState.velocityY}
+        isGrounded={renderState.isGrounded}
         isMoving={keys.has(CONTROLS.moveLeft) || keys.has(CONTROLS.moveRight)}
         isRunning={keys.has(CONTROLS.run) || keys.has("ShiftRight")}
-        facing={facingRef.current}
+        facing={renderState.facing}
       />
 
       {!hideUI && <ControlsHint />}

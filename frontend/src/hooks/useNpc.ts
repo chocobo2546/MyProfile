@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { npcService, type NPC, type Dialogue } from "../services/npcService";
+import { npcService, type NPC } from "../services/npcService";
 
 export const useNPCs = () => {
   return useQuery({
@@ -36,8 +36,7 @@ export const useCreateNPC = () => {
 export const useUpdateNPC = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<NPC> }) =>
-      npcService.updateNPC(id, data),
+    mutationFn: ({ id, data }: { id: number; data: Partial<NPC> }) => npcService.updateNPC(id, data).then(res => res.data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["npcs"] }),
   });
 };

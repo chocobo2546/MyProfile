@@ -5,25 +5,24 @@ export interface ResumeInfo {
   downloadUrl: string;
 }
 
-const mockResume: ResumeInfo = {
-  fileName: "my-resume.pdf",
-  downloadUrl: "/resume/forTest.pdf",
-};
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
 
 export const resumeService = {
-  getResumeInfo: async () => {
-    // Mock data
-    return {
-      success: true,
-      message: "Resume info fetched",
-      data: mockResume,
-    };
+  getResumeInfo: async (): Promise<ApiResponse<ResumeInfo>> => {
+    const response = await apiClient.get<ApiResponse<ResumeInfo>>("/resume");
+    return response.data;
   },
-  uploadResume: async (file: File) => {
-    // Mock: simulate upload
-    return {
-      success: true,
-      message: "Resume uploaded successfully",
-    };
+
+  uploadResume: async (file: File): Promise<ApiResponse<void>> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await apiClient.post<ApiResponse<void>>("/resume", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
   },
 };

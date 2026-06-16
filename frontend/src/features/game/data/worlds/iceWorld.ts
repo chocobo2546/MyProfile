@@ -47,4 +47,31 @@ export const iceWorld: WorldData = {
       label: "Lava World",
     },
   ],
+  npcs: [
+    {
+      id: "frost",
+      name: "Frost",
+      x: 250,
+      y: 60,
+      width: 48,
+      height: 60,
+      dialogues: [
+        { sequence: 1, message: "Brrr... welcome to Ice World!" },
+        { sequence: 2, message: "Keep moving or you will freeze solid." },
+      ],
+    },
+    {
+      id: "glaciel",
+      name: "Glaciel",
+      x: 1300,
+      y: 280,
+      width: 48,
+      height: 60,
+      imageUrl: "",
+      dialogues: [
+        { sequence: 1, message: "I am Glaciel, guardian of the frozen peaks." },
+        { sequence: 2, message: "A blizzard is coming. Take shelter ahead." },
+      ],
+    },
+  ],
 };

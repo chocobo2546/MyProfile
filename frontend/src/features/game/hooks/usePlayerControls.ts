@@ -4,6 +4,7 @@ import { CONTROLS } from "../engine/InputManager";
 interface UsePlayerControlsParams {
   keys: Set<string>;
   toggleHideUI: () => void;
+  onInteract?: () => void;
 }
 
 interface UsePlayerControlsReturn {
@@ -11,7 +12,7 @@ interface UsePlayerControlsReturn {
   facingRef: React.MutableRefObject<"left" | "right">;
 }
 
-export const usePlayerControls = ({ keys, toggleHideUI }: UsePlayerControlsParams): UsePlayerControlsReturn => {
+export const usePlayerControls = ({ keys, toggleHideUI, onInteract }: UsePlayerControlsParams): UsePlayerControlsReturn => {
   const keysRef = useRef<Set<string>>(keys);
   const facingRef = useRef<"left" | "right">("right");
   const previousKeysRef = useRef<Set<string>>(new Set());
@@ -32,8 +33,14 @@ export const usePlayerControls = ({ keys, toggleHideUI }: UsePlayerControlsParam
       toggleHideUI();
     }
 
+    const wasInteractPressed = previousKeysRef.current.has(CONTROLS.interact);
+    const isInteractPressed = keys.has(CONTROLS.interact);
+    if (isInteractPressed && !wasInteractPressed) {
+      onInteract?.();
+    }
+
     previousKeysRef.current = keys;
-  }, [keys, toggleHideUI]);
+  }, [keys, toggleHideUI, onInteract]);
 
   return { keysRef, facingRef };
 };

@@ -34,22 +34,22 @@ export const Navbar = ({ worldLabel, onBack, onOpenDownloads }: Props) => {
         justifyContent: "space-between",
         gap: 16,
         padding: "0 24px",
-        background: "rgba(0,0,0,0.58)",
+        background: "rgba(10,10,10,0.85)",
         backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
+        borderBottom: "1px solid rgba(255,255,255,0.04)",
         zIndex: 1000,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
-        <Button variant="secondary" onClick={handleBack} height={40}>
-          Back
+        <Button variant="secondary" onClick={handleBack} height={40} fontSize={13}>
+          ← Back
         </Button>
 
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ color: "white", fontWeight: 800, fontSize: 18, lineHeight: 1.1 }}>
-            Interactive Portfolio
+          <div style={{ color: "#e0e0e0", fontWeight: 700, fontSize: 18, lineHeight: 1.1 }}>
+            Interactive <span style={{ color: "#00c853" }}>Portfolio</span>
           </div>
-          <div style={{ color: "rgba(255,255,255,0.72)", fontSize: 12, marginTop: 3 }}>
+          <div style={{ color: "#888", fontSize: 12, marginTop: 2 }}>
             {worldLabel}
           </div>
         </div>
@@ -60,7 +60,7 @@ export const Navbar = ({ worldLabel, onBack, onOpenDownloads }: Props) => {
         align="right"
         width={240}
         trigger={
-          <Button variant="secondary" height={40}>
+          <Button variant="secondary" height={40} fontSize={13}>
             Downloads
           </Button>
         }

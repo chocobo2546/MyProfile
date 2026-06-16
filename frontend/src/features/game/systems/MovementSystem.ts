@@ -46,7 +46,7 @@ export const updatePlayer = ({
   const prevX = player.x;
   const prevY = player.y;
 
-  let isGrounded = false;
+  let isGrounded: boolean;
 
   const moveLeft = keys.has(CONTROLS.moveLeft);
   const moveRight = keys.has(CONTROLS.moveRight);

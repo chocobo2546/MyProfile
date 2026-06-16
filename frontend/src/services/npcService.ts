@@ -3,7 +3,7 @@ import { apiClient } from "../api/client";
 export interface NPC {
   id: number;
   name: string;
-  worldId: string;
+  worldId: number;
 }
 
 export interface Dialogue {
@@ -11,54 +11,40 @@ export interface Dialogue {
   message: string;
 }
 
-const mockNPCs: NPC[] = [
-  { id: 1, name: "Guide", worldId: "lava-world" },
-  { id: 2, name: "Elder", worldId: "ice-world" },
-];
-
-const mockDialogues: Record<number, Dialogue[]> = {
-  1: [
-    { sequence: 1, message: "Hello, traveler!" },
-    { sequence: 2, message: "Welcome to my portfolio world." },
-  ],
-  2: [
-    { sequence: 1, message: "The ice world holds many secrets." },
-    { sequence: 2, message: "Explore and discover." },
-  ],
-};
+interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
 
 export const npcService = {
-  getAllNPCs: async () => {
-    return {
-      success: true,
-      message: "NPCs fetched",
-      data: mockNPCs,
-    };
+  getAllNPCs: async (): Promise<ApiResponse<NPC[]>> => {
+    const response = await apiClient.get<ApiResponse<NPC[]>>("/npc");
+    return response.data;
   },
-  getNPCById: async (id: number) => {
-    const npc = mockNPCs.find(n => n.id === id);
-    return {
-      success: true,
-      message: "NPC fetched",
-      data: npc || null,
-    };
+
+  getNPCById: async (id: number): Promise<ApiResponse<NPC | null>> => {
+    const response = await apiClient.get<ApiResponse<NPC>>(`/npc/${id}`);
+    return response.data;
   },
-  getDialogues: async (npcId: number) => {
-    const dialogues = mockDialogues[npcId] || [];
-    return {
-      success: true,
-      message: "Dialogues fetched",
-      data: dialogues,
-    };
+
+  getDialogues: async (npcId: number): Promise<ApiResponse<Dialogue[]>> => {
+    const response = await apiClient.get<ApiResponse<Dialogue[]>>(`/npc/${npcId}/dialogues`);
+    return response.data;
   },
-  // Admin methods (placeholder)
-  createNPC: async (data: Omit<NPC, "id">) => {
-    return { success: true, message: "NPC created", data: { id: Date.now(), ...data } };
+
+  createNPC: async (data: Omit<NPC, "id">): Promise<ApiResponse<NPC>> => {
+    const response = await apiClient.post<ApiResponse<NPC>>("/npc", data);
+    return response.data;
   },
-  updateNPC: async (id: number, data: Partial<NPC>) => {
-    return { success: true, message: "NPC updated" };
+
+  updateNPC: async (id: number, data: Partial<NPC>): Promise<ApiResponse<NPC>> => {
+    const response = await apiClient.put<ApiResponse<NPC>>(`/npc/${id}`, data);
+    return response.data;
   },
-  deleteNPC: async (id: number) => {
-    return { success: true, message: "NPC deleted" };
+
+  deleteNPC: async (id: number): Promise<ApiResponse<null>> => {
+    const response = await apiClient.delete<ApiResponse<null>>(`/npc/${id}`);
+    return response.data;
   },
 };

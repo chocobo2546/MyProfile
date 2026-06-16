@@ -43,6 +43,22 @@ export type Decoration = {
   parallax?: number;
 };
 
+export type Npc = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  imageUrl?: string;
+  dialogues?: NpcDialogue[];
+};
+
+export type NpcDialogue = {
+  sequence: number;
+  message: string;
+};
+
 export type BackgroundLayer = {
   image: string;
   speed?: number;
@@ -70,6 +86,7 @@ export type WorldData = {
   targets: Target[];
   portals: Portal[];
   decorations: Decoration[];
+  npcs?: Npc[];
 };
 
 export type PlayerState = {
