@@ -24,10 +24,10 @@ const WORLDS: Record<WorldId, WorldData> = {
   "ice-world": iceWorld,
 };
 
-const formatWorldLabel = (id: string): string =>
-  id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+// const formatWorldLabel = (id: string): string =>
+//   id.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
+export const GameCanvas = ({ onBack }: Props) => {
   const keys = useKeyboard();
   const { hideUI, toggleHideUI } = useGameUIStore();
   const { worldId } = useWorldStore();
@@ -158,8 +158,6 @@ export const GameCanvas = ({ onBack, onOpenDownloads }: Props) => {
       {!hideUI && (
         <Navbar
           onBack={onBack}
-          onOpenDownloads={onOpenDownloads}
-          worldLabel={formatWorldLabel(currentWorld.id)}
         />
       )}
 

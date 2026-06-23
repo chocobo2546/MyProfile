@@ -45,12 +45,10 @@ export type Decoration = {
 
 export type Npc = {
   id: string;
-  name: string;
   x: number;
   y: number;
   width: number;
   height: number;
-  imageUrl?: string;
   dialogues?: NpcDialogue[];
 };
 

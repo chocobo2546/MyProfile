@@ -12,7 +12,7 @@ export const AdminRoute = ({ children }: Props) => {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate("/login", { replace: true });
+      navigate("/auth", { replace: true });
       return;
     }
     if (!isLoading && user?.role !== "ROLE_ADMIN") {

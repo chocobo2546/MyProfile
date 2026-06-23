@@ -1,5 +1,10 @@
 import { apiClient } from "../api/client";
 
+export interface ValidationError {
+  field: string;
+  message: string;
+}
+
 export interface UserResponse {
   id: number;
   email: string;
@@ -10,6 +15,7 @@ interface ApiResponse<T> {
   success: boolean;
   message: string;
   data?: T;
+  errors?: ValidationError[];
 }
 
 interface LoginRequest {

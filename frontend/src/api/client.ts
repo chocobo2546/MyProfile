@@ -15,8 +15,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       const currentPath = window.location.pathname;
-      if (currentPath !== "/login" && currentPath !== "/register") {
-        window.location.href = "/login";
+      if (currentPath !== "/auth") {
+        window.location.href = "/auth";
       }
     }
     return Promise.reject(error);

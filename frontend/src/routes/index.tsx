@@ -1,12 +1,13 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { AppLayout } from "../components/layouts/AppLayout";
 import { MenuPage } from "../pages/MenuPage";
 import { GamePage } from "../pages/GamePage";
 import { DownloadsPage } from "../pages/DownloadsPage";
-import { LoginPage } from "../pages/LoginPage";
-import { RegisterPage } from "../pages/RegisterPage";
+import { AuthPage } from "../pages/AuthPage";
 import { AboutPage } from "../pages/AboutPage";
+import { ProjectPage } from "../pages/ProjectPage";
+import { CertificatesPage } from "../pages/CertificatesPage";
 import { DashboardPage } from "../pages/DashboardPage";
 import { AdminDashboardPage } from "../pages/AdminDashboardPage";
 import { AdminProjectsPage } from "../pages/AdminProjectsPage";
@@ -32,9 +33,12 @@ export const router = createBrowserRouter([
       { path: "/", element: <MenuPage /> },
       { path: "/downloads", element: <DownloadsPage /> },
       { path: "/about", element: <AboutPage /> },
+      { path: "/project", element: <ProjectPage /> },
+      { path: "/certificates", element: <CertificatesPage /> },
       { path: "/dashboard", element: wrapProtected(<DashboardPage />) },
-      { path: "/login", element: <LoginPage /> },
-      { path: "/register", element: <RegisterPage /> },
+      { path: "/auth", element: <AuthPage /> },
+      { path: "/login", element: <Navigate to="/auth?mode=login" replace /> },
+      { path: "/register", element: <Navigate to="/auth?mode=register" replace /> },
       { path: "/admin", element: wrapAdmin(<AdminDashboardPage />) },
       { path: "/admin/projects", element: wrapAdmin(<AdminProjectsPage />) },
       { path: "/admin/npcs", element: wrapAdmin(<AdminNPCsPage />) },

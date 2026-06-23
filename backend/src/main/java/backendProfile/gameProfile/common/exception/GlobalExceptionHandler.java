@@ -1,6 +1,7 @@
 package backendProfile.gameProfile.common.exception;
 
 import backendProfile.gameProfile.common.response.ApiResponse;
+import backendProfile.gameProfile.common.validation.exception.MaliciousInputException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,13 @@ public class GlobalExceptionHandler {
         log.error("Business exception: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(MaliciousInputException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMaliciousInput(MaliciousInputException ex, WebRequest request) {
+        log.error("Malicious input detected [{}]: {}", ex.getAttackType(), ex.getInputPreview());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Malicious input detected: " + ex.getAttackType()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

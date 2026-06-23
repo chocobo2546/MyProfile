@@ -50,7 +50,6 @@ export const iceWorld: WorldData = {
   npcs: [
     {
       id: "frost",
-      name: "Frost",
       x: 250,
       y: 60,
       width: 48,
@@ -62,12 +61,10 @@ export const iceWorld: WorldData = {
     },
     {
       id: "glaciel",
-      name: "Glaciel",
       x: 1300,
       y: 280,
       width: 48,
       height: 60,
-      imageUrl: "",
       dialogues: [
         { sequence: 1, message: "I am Glaciel, guardian of the frozen peaks." },
         { sequence: 2, message: "A blizzard is coming. Take shelter ahead." },

@@ -106,7 +106,6 @@ export const lavaWorld: WorldData = {
   npcs: [
     {
       id: "blaze",
-      name: "Blaze",
       x: 400,
       y: 110,
       width: 48,
@@ -119,7 +118,6 @@ export const lavaWorld: WorldData = {
     },
     {
       id: "ignis",
-      name: "Ignis",
       x: 1100,
       y: 210,
       width: 48,

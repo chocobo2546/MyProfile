@@ -1,3 +1,6 @@
+import npcIdle0 from "../../../assets/npc/npc-idle_0.png";
+import npcIdle1 from "../../../assets/npc/npc-idle_1.png";
+
 import idle0 from "../../../assets/characters/idle/idle_0.png";
 import idle1 from "../../../assets/characters/idle/idle_1.png";
 import idle2 from "../../../assets/characters/idle/idle_2.png";
@@ -84,6 +87,14 @@ type AnimationParams = {
   velocityY: number;
   isMoving: boolean;
   isRunning: boolean;
+};
+
+export const NPC_IDLE_ANIMATION: AnimationClip = {
+  fps: 3,
+  frames: [
+    { image: npcIdle0, width: 120, height: 250, offsetX: 10, offsetY: -90 },
+    { image: npcIdle1, width: 100, height: 200, offsetX: 15, offsetY: -75 },
+  ],
 };
 
 export const resolveAnimationState = ({

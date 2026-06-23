@@ -1,14 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/Button";
-import { Dropdown } from "../../components/ui/Dropdown";
+// import { Dropdown } from "../../components/ui/Dropdown";
 
 interface Props {
-  worldLabel: string;
+  // worldLabel: string;
   onBack?: () => void;
-  onOpenDownloads?: () => void;
+  // onOpenDownloads?: () => void;
 }
 
-export const Navbar = ({ worldLabel, onBack, onOpenDownloads }: Props) => {
+export const Navbar = ({ onBack }: Props) => {
   const navigate = useNavigate();
 
   const handleBack = () => {
@@ -16,10 +16,10 @@ export const Navbar = ({ worldLabel, onBack, onOpenDownloads }: Props) => {
     else navigate("/");
   };
 
-  const handleDownloads = () => {
-    if (onOpenDownloads) onOpenDownloads();
-    else navigate("/downloads");
-  };
+  // const handleDownloads = () => {
+  //   if (onOpenDownloads) onOpenDownloads();
+  //   else navigate("/downloads");
+  // };
 
   return (
     <div
@@ -49,13 +49,13 @@ export const Navbar = ({ worldLabel, onBack, onOpenDownloads }: Props) => {
           <div style={{ color: "#e0e0e0", fontWeight: 700, fontSize: 18, lineHeight: 1.1 }}>
             Interactive <span style={{ color: "#00c853" }}>Portfolio</span>
           </div>
-          <div style={{ color: "#888", fontSize: 12, marginTop: 2 }}>
+          {/* <div style={{ color: "#888", fontSize: 12, marginTop: 2 }}>
             {worldLabel}
-          </div>
+          </div> */}
         </div>
       </div>
 
-      <Dropdown
+      {/* <Dropdown
         openOnHover
         align="right"
         width={240}
@@ -68,7 +68,7 @@ export const Navbar = ({ worldLabel, onBack, onOpenDownloads }: Props) => {
           { label: "Full Resume",    onClick: handleDownloads },
           { label: "Full Portfolio", onClick: handleDownloads },
         ]}
-      />
+      /> */}
     </div>
   );
 };

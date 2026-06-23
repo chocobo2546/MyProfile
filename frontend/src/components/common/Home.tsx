@@ -51,7 +51,7 @@ export const Home = ({ onStart }: Props) => {
         >
           <span style={{ color: "#00c853" }}>Welcome</span>
           <br />
-          This all my story
+          This is My Profile
         </h1>
 
         <button
@@ -89,7 +89,7 @@ export const Home = ({ onStart }: Props) => {
           >
             <polygon points="5 3 19 12 5 21 5 3" />
           </svg>
-          Start My Story
+          Experiences & Skills
         </button>
       </div>
     </div>

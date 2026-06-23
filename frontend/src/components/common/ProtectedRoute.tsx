@@ -12,7 +12,7 @@ export const ProtectedRoute = ({ children }: Props) => {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      navigate("/login", { replace: true });
+      navigate("/auth", { replace: true });
     }
   }, [isAuthenticated, isLoading, navigate]);
 

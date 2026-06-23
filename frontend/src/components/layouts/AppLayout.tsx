@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Navbar } from "./Navbar";
+import { ParticleBackground } from "../ui/ParticleBackground";
 
 export const AppLayout = () => {
   return (
@@ -13,6 +14,7 @@ export const AppLayout = () => {
         color: "#e0e0e0",
       }}
     >
+      <ParticleBackground />
       <Navbar />
       <main
         style={{
@@ -20,6 +22,8 @@ export const AppLayout = () => {
           paddingTop: 64,
           overflowY: "auto",
           overflowX: "hidden",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <div

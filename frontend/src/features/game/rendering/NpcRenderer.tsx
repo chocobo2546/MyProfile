@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import type { Npc } from "../types/gameTypes";
+import { NPC_IDLE_ANIMATION } from "../engine/PhysicsManager";
 
 interface NpcRendererProps {
   npc: Npc;
@@ -7,6 +9,18 @@ interface NpcRendererProps {
 }
 
 export const NpcRenderer = ({ npc, isActive, dialogueIndex }: NpcRendererProps) => {
+  const [frameIndex, setFrameIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = 1000 / NPC_IDLE_ANIMATION.fps;
+    const id = setInterval(() => {
+      setFrameIndex((prev) => (prev + 1) % NPC_IDLE_ANIMATION.frames.length);
+    }, interval);
+    return () => clearInterval(id);
+  }, []);
+
+  const frame = NPC_IDLE_ANIMATION.frames[frameIndex % NPC_IDLE_ANIMATION.frames.length];
+
   const dialogues = npc.dialogues;
   const hasDialogues = dialogues && dialogues.length > 0;
   const currentDialogue = hasDialogues ? dialogues[dialogueIndex % dialogues.length] : null;
@@ -24,52 +38,21 @@ export const NpcRenderer = ({ npc, isActive, dialogueIndex }: NpcRendererProps) 
         transition: "left 0.1s, bottom 0.1s",
       }}
     >
-      {npc.imageUrl ? (
-        <img
-          src={npc.imageUrl}
-          alt={npc.name}
-          draggable={false}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            pointerEvents: "none",
-            userSelect: "none",
-            imageRendering: "auto",
-          }}
-        />
-      ) : (
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            backgroundColor: "#e3342f",
-            border: "2px solid #cc1f1a",
-            borderRadius: 4,
-            boxShadow: "0 0 12px rgba(227, 52, 47, 0.6)",
-          }}
-        />
-      )}
-
-      <div
+      <img
+        src={frame.image}
+        draggable={false}
         style={{
           position: "absolute",
-          top: -22,
-          left: "50%",
+          left: `calc(50% + ${frame.offsetX}px)`,
+          bottom: frame.offsetY,
+          width: frame.width,
+          height: frame.height,
           transform: "translateX(-50%)",
-          padding: "2px 8px",
-          borderRadius: 4,
-          backgroundColor: "rgba(0,0,0,0.7)",
-          color: "#fff",
-          fontSize: 12,
-          fontWeight: 600,
-          whiteSpace: "nowrap",
           pointerEvents: "none",
           userSelect: "none",
+          imageRendering: "pixelated",
         }}
-      >
-        {npc.name}
-      </div>
+      />
 
       {isActive && currentDialogue && (
         <div

@@ -3,10 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../store/authStore";
 
 const navItems = [
-  { label: "Home", path: "/" },
   { label: "Downloads", path: "/downloads" },
-  { label: "Dashboard", path: "/dashboard", requireAuth: true },
+  { label: "Project", path: "/project" },
+  { label: "Certificates", path: "/certificates" },
   { label: "About", path: "/about" },
+  { label: "Dashboard", path: "/dashboard", requireAuth: true },
   { label: "Edit", path: "/admin", requireAdmin: true },
 ];
 
@@ -78,7 +79,7 @@ export const Navbar = () => {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        padding: "0 2rem",
+        padding: "0 2rem 0 1rem",
         height: 64,
         background: "rgba(10,10,10,.85)",
         backdropFilter: "blur(12px)",
@@ -91,15 +92,30 @@ export const Navbar = () => {
       }}
     >
       <div
+        onClick={() => navigate("/")}
         style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          cursor: "pointer",
           fontWeight: 700,
           fontSize: "1.3rem",
           letterSpacing: "-.5px",
-          cursor: "pointer",
         }}
-        onClick={() => navigate("/")}
       >
-        Some <span style={{ color: "#00c853" }}>Logo</span>
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#00c853"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
       </div>
 
       <button
@@ -195,17 +211,17 @@ export const Navbar = () => {
         ) : (
           <li>
             <button
-              onClick={() => navigate("/login")}
-              style={linkStyle(isActive("/login"))}
+              onClick={() => navigate("/auth")}
+              style={linkStyle(isActive("/auth"))}
               onMouseEnter={(e) => {
-                if (!isActive("/login")) e.currentTarget.style.color = "#e0e0e0";
+                if (!isActive("/auth")) e.currentTarget.style.color = "#e0e0e0";
               }}
               onMouseLeave={(e) => {
-                if (!isActive("/login")) e.currentTarget.style.color = "#888";
+                if (!isActive("/auth")) e.currentTarget.style.color = "#888";
               }}
             >
               Login
-              <span style={underlineStyle(isActive("/login"))} />
+              <span style={underlineStyle(isActive("/auth"))} />
             </button>
           </li>
         )}

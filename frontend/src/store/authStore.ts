@@ -1,16 +1,18 @@
 import { create } from "zustand";
-import { authService, type UserResponse } from "../services/authService";
+import { authService, type UserResponse, type ValidationError } from "../services/authService";
 
 interface AuthState {
   user: UserResponse | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  fieldErrors: Record<string, string>;
   login: (email: string, password: string) => Promise<boolean>;
   register: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
   clearError: () => void;
+  clearFieldError: (field: string) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -18,37 +20,98 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   isLoading: true,
   error: null,
+  fieldErrors: {},
 
   login: async (email: string, password: string) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, fieldErrors: {} });
     try {
       const response = await authService.login({ email, password });
       if (response.success && response.data) {
         set({ user: response.data, isAuthenticated: true, isLoading: false });
         return true;
       }
-      set({ error: response.message, isLoading: false });
+      const fieldErrors: Record<string, string> = {};
+      response.errors?.forEach((e: ValidationError) => {
+        fieldErrors[e.field] = e.message;
+      });
+      set({
+        error: Object.keys(fieldErrors).length > 0 ? null : response.message,
+        fieldErrors,
+        isLoading: false,
+      });
       return false;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Login failed";
-      set({ error: message, isLoading: false });
+      let message = "Something went wrong";
+      const fieldErrors: Record<string, string> = {};
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosErr = err as {
+          response?: {
+            data?: {
+              message?: string;
+              errors?: { field: string; message: string }[];
+            };
+          };
+        };
+        const data = axiosErr.response?.data;
+        if (data) {
+          data.errors?.forEach((e) => {
+            fieldErrors[e.field] = e.message;
+          });
+          if (Object.keys(fieldErrors).length > 0) {
+            message = "";
+          } else if (data.message) {
+            message = data.message;
+          }
+        }
+      }
+      set({ error: message || null, fieldErrors, isLoading: false });
       return false;
     }
   },
 
   register: async (email: string, password: string) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null, fieldErrors: {} });
     try {
       const response = await authService.register({ email, password });
       if (response.success) {
         set({ isLoading: false });
         return true;
       }
-      set({ error: response.message, isLoading: false });
+      const fieldErrors: Record<string, string> = {};
+      response.errors?.forEach((e: ValidationError) => {
+        fieldErrors[e.field] = e.message;
+      });
+      set({
+        error: Object.keys(fieldErrors).length > 0 ? null : response.message,
+        fieldErrors,
+        isLoading: false,
+      });
       return false;
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Registration failed";
-      set({ error: message, isLoading: false });
+      let message = "Something went wrong";
+      const fieldErrors: Record<string, string> = {};
+      if (err && typeof err === "object" && "response" in err) {
+        const axiosErr = err as {
+          response?: {
+            data?: {
+              message?: string;
+              errors?: { field: string; message: string }[];
+            };
+          };
+        };
+        const data = axiosErr.response?.data;
+        if (data) {
+          data.errors?.forEach((e) => {
+            fieldErrors[e.field] = e.message;
+          });
+          if (Object.keys(fieldErrors).length > 0) {
+            message = "";
+          } else if (data.message) {
+            message = data.message;
+          }
+        }
+      }
+      set({ error: message || null, fieldErrors, isLoading: false });
       return false;
     }
   },
@@ -59,7 +122,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch {
       // Even if logout API fails, clear local state
     }
-    set({ user: null, isAuthenticated: false, error: null });
+    set({ user: null, isAuthenticated: false, error: null, fieldErrors: {} });
   },
 
   checkAuth: async () => {
@@ -76,5 +139,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  clearError: () => set({ error: null }),
+  clearError: () => set({ error: null, fieldErrors: {} }),
+  clearFieldError: (field: string) =>
+    set((state) => {
+      const { [field]: _, ...rest } = state.fieldErrors;
+      return { fieldErrors: rest };
+    }),
 }));
